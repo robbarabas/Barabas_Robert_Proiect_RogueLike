@@ -7,7 +7,7 @@
 # BlueJ files
 *.ctxt
 # Ignore specific folders
-build/reports
+build/reports/**
 
 
 # Mobile Tools for Java (J2ME)
