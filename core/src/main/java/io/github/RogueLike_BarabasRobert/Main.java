@@ -31,10 +31,11 @@ public class Main extends Game {
     public void create() {
 
         Tony=new Protagonist();
-        setScreen(new FirstScreen());
-
-        spriteBatch = new SpriteBatch();
         viewport = new FitViewport(16, 10);
+
+        setScreen(new MainMenuScreen(this)); // Start with menu
+        spriteBatch = new SpriteBatch();
+
     }
     @Override
     public void resize(int width, int height) {
@@ -46,7 +47,8 @@ public class Main extends Game {
         input();
         handleInput();
         logic();
-        draw();
+        super.render();
+        //draw();
     }
 
     private void input() {
@@ -54,7 +56,8 @@ public class Main extends Game {
     }
 
     private void logic() {
-    Tony.update();
+        float delta = Gdx.graphics.getDeltaTime(); // Get time since last frame
+        Tony.update(delta);
     }
 
     private void draw() {
@@ -66,7 +69,7 @@ public class Main extends Game {
         float worldHeight = viewport.getWorldHeight();
        // spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight); // draw the background
       //  spriteBatch.draw(Texture_Tony, 0, 0, 1, 1);
-        Tony.render(sprit eBatch);
+        Tony.render(spriteBatch);
         spriteBatch.end();
     }
 }

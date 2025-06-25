@@ -1,26 +1,43 @@
 package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
+    Protagonist Tony;
+    SpriteBatch spriteBatch;
+    FitViewport viewport;
+
+    public FirstScreen() {
+        Tony = new Protagonist();
+        spriteBatch = new SpriteBatch();
+        viewport = new FitViewport(16, 10);
+    }
+
     @Override
     public void show() {
         // Prepare your screen here.
     }
 
+
     @Override
     public void render(float delta) {
-        // Draw your screen here. "delta" is the time since last render in seconds.
+        Tony.update(delta);
+        ScreenUtils.clear(Color.CLEAR_WHITE);
+        viewport.apply();
+        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        spriteBatch.begin();
+        Tony.render(spriteBatch);
+        spriteBatch.end();
     }
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
-
-        // Resize your screen here. The parameters represent the new window size.
+        viewport.update(width, height, true);
     }
 
     @Override
@@ -37,9 +54,9 @@ public class FirstScreen implements Screen {
     public void hide() {
         // This method is called when another screen replaces this one.
     }
-
     @Override
     public void dispose() {
-        // Destroy screen's assets here.
+        spriteBatch.dispose();
+        Tony.dispose();
     }
 }
