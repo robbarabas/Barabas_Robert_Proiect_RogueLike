@@ -1,5 +1,9 @@
 .gitkeep
 Apple_body.png
+Apple_face_0.png
+background_0.png
+enemy_0_body.png
+enemy_0_face.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
 ui/font-window.fnt
