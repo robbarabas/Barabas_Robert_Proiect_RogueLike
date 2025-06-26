@@ -8,37 +8,49 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 
 public class MainMenuScreen extends ScreenAdapter {
-    final Main game; // reference to your main game class
+    final Main game;
     Stage stage;
     Skin skin;
+    InputMultiplexer multiplexer = new InputMultiplexer();
 
     public MainMenuScreen(Main game) {
         this.game = game;
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
 
-        // Use LibGDX default skin (or your own)
+        // Create stage with ScreenViewport (correct for UI)
+        stage = new Stage(new ScreenViewport());
+
+        // InputMultiplexer to allow future extensibility
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
+
+        // Debug UI layout
+        stage.setDebugAll(true);
+
+        // Load skin (ensure "ui/uiskin.json" exists)
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
-        // Create UI elements
+        // Create Start Game button
         TextButton startButton = new TextButton("Start Game", skin);
 
-        // Add listener
-        startButton.addListener(event -> {
-            if (startButton.isPressed()) {
-                game.setScreen(new FirstScreen()); // Launch game
-                return true;
+        // Correct click detection
+        startButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new FirstScreen()); // Swap to game screen
             }
-            return false;
         });
 
-        // Layout using a Table
+        // Layout button using table
         Table table = new Table();
         table.setFillParent(true);
         table.center();
         table.add(startButton).width(200).height(60);
+
         stage.addActor(table);
     }
 
@@ -46,8 +58,14 @@ public class MainMenuScreen extends ScreenAdapter {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         stage.act(delta);
         stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
