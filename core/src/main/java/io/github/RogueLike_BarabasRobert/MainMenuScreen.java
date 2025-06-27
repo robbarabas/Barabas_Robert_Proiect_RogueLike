@@ -53,7 +53,10 @@ public class MainMenuScreen extends ScreenAdapter {
 
         stage.addActor(table);
     }
-
+    @Override
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -73,4 +76,5 @@ public class MainMenuScreen extends ScreenAdapter {
         stage.dispose();
         skin.dispose();
     }
+
 }

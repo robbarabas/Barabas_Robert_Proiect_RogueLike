@@ -22,8 +22,9 @@ public class Protagonist {
 
     float shootCooldown = 0.3f;
     float timeSinceLastShot = 0;
-    private float speed=5f;
-    private int health = 5;
+    public float speed=5.5f;
+    public int health = 5;
+    public float power=2;
 
     public void takeDamage(int amount) {
         health -= amount;
@@ -49,7 +50,7 @@ public class Protagonist {
 
     public Protagonist() {
         Texture_Tony = new Texture("Apple_body.png");
-        projectileTexture = new Texture("Apple_body.png"); // Make sure this exists
+        projectileTexture = new Texture("projectile_0.png"); // Make sure this exists
         Tony_face=new Texture("Apple_face_0.png");
         sprite = new Sprite(Texture_Tony);
         sprite.setSize(1, 1);
@@ -61,20 +62,37 @@ public class Protagonist {
         projectiles = new ArrayList<>();
     }
 
-    public void update(float delta) {
-        // Shooting
-        float dx = 0;
-        float dy = 0;
+    public void update(float delta, List<Wall> walls) {
+        float moveX = 0;
+        float moveY = 0;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * delta;
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) dy -= speed * delta;
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) dx -= speed * delta;
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) dx += speed * delta;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) moveY += 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) moveY -= 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) moveX -= 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) moveX += 1;
 
-        float newX = sprite.getX() + dx;
-        float newY = sprite.getY() + dy;
-        sprite.setPosition(newX, newY);
-        sprite_face.setPosition(newX, newY);
+        float length = (float) Math.sqrt(moveX * moveX + moveY * moveY);
+        if (length != 0) {
+            moveX /= length;
+            moveY /= length;
+        }
+
+        float newX = sprite.getX() + moveX * speed * delta;
+        float newY = sprite.getY() + moveY * speed * delta;
+        Rectangle futureBounds = new Rectangle(newX, newY, sprite.getWidth(), sprite.getHeight());
+
+        boolean collides = false;
+        for (Wall wall : walls) {
+            if (futureBounds.overlaps(wall.getBounds())) {
+                collides = true;
+                break;
+            }
+        }
+
+        if (!collides) {
+            sprite.setPosition(newX, newY);
+            sprite_face.setPosition(newX,newY);
+        }
 
         timeSinceLastShot += delta;
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && timeSinceLastShot >= shootCooldown) {
@@ -91,6 +109,7 @@ public class Protagonist {
                 iter.remove();
             }
         }
+
     }
     private void rotate_around_cursor(Sprite spr,float newX,float newY)
     {

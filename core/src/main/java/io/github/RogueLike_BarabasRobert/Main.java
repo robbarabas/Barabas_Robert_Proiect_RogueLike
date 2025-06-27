@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Main extends Game {
-    Protagonist Tony;
+
     SpriteBatch spriteBatch;
     FitViewport viewport;
 
@@ -34,7 +34,7 @@ public class Main extends Game {
     public void create() {
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(16, 10); // Game world viewport
-        Tony = new Protagonist();
+
 
         // Start with menu screen
         setScreen(new MainMenuScreen(this));
@@ -63,4 +63,5 @@ public class Main extends Game {
     public void dispose() {
         if (spriteBatch != null) spriteBatch.dispose();
     }
+
 }
