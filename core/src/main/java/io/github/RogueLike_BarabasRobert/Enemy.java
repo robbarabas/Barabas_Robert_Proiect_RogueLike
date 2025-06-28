@@ -12,6 +12,8 @@ public class Enemy {
     Sprite face;
     Protagonist target;
     float speed = 2.0f;
+
+
     float damageCooldown = 1f;
     float timeSinceLastHit = 0f;
     float health = 3;
@@ -233,6 +235,13 @@ public class Enemy {
                 bounds = getBounds();
             }
         }
+    }
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
 }

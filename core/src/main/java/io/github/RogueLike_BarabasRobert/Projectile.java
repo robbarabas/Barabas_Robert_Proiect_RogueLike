@@ -9,41 +9,54 @@ public class Projectile {
     float x, y;
     float dx, dy;
     float speed = 10f;
+    float lifeTime = 0f;
+    float maxLifeTime = 3f; // Optional: remove after 3 seconds
+    boolean hasHit = false;
+
     Texture texture;
     Sprite sprite;
 
     public Projectile(float x, float y, float dirX, float dirY, Texture texture) {
         this.x = x;
         this.y = y;
-        this.dx = dirX * speed;
-        this.dy = dirY * speed;
+        float length = (float)Math.sqrt(dirX * dirX + dirY * dirY);
+        this.dx = (dirX / length) * speed;
+        this.dy = (dirY / length) * speed;
         this.texture = texture;
         this.sprite = new Sprite(texture);
-        this.sprite.setSize(0.3f, 0.3f);
+        this.sprite.setSize(0.5f, 0.5f);
 
-        // Set rotation based on direction
-        float angle = (float)Math.toDegrees(Math.atan2(dirY, dirX));
+        float angle = (float) Math.toDegrees(Math.atan2(dirY, dirX));
         sprite.setRotation(angle);
         sprite.setOriginCenter();
-
-        this.sprite.setPosition(x, y);
+        sprite.setPosition(x, y);
     }
 
     public void update(float delta) {
         x += dx * delta;
         y += dy * delta;
         sprite.setPosition(x, y);
+        lifeTime += delta;
     }
 
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
     }
 
-    public boolean isOffScreen() {
-        return x < 0 || y < 0 || x > 16 || y > 10;
+    public Rectangle getBounds() {
+        return sprite.getBoundingRectangle();
     }
 
-    public com.badlogic.gdx.math.Rectangle getBounds() {
-        return sprite.getBoundingRectangle();
+    public boolean isOffScreen() {
+
+        return x < -1 || y < -1 || x > 17 || y > 11;
+    }
+
+    public boolean shouldRemove() {
+        return isOffScreen() || hasHit || lifeTime > maxLifeTime;
+    }
+
+    public void onHit() {
+        hasHit = true;
     }
 }

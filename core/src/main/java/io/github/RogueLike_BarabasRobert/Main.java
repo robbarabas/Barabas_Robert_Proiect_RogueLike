@@ -4,12 +4,17 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Main extends Game {
+    public int totalCoins = 0;
+    public int health = 100;
+
+
 
     SpriteBatch spriteBatch;
     FitViewport viewport;
@@ -62,6 +67,8 @@ public class Main extends Game {
     @Override
     public void dispose() {
         if (spriteBatch != null) spriteBatch.dispose();
+        FileHandle file = Gdx.files.local("save.txt");
+        file.writeString(health + "," + totalCoins, false);
     }
 
 }

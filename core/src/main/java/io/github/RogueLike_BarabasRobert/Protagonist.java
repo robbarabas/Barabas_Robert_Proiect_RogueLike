@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TooManyListenersException;
 
 public class Protagonist {
     Texture Texture_Tony;
@@ -20,10 +19,10 @@ public class Protagonist {
     Texture projectileTexture;
     List<Projectile> projectiles;
 
-    float shootCooldown = 0.3f;
+    float shootCooldown = 0.2f;
     float timeSinceLastShot = 0;
     public float speed=5.5f;
-    public int health = 5;
+    public int health ;
     public float power=2;
 
     public void takeDamage(int amount) {
@@ -48,17 +47,17 @@ public class Protagonist {
     }
 
 
-    public Protagonist() {
+    public Protagonist(int health) {
         Texture_Tony = new Texture("Apple_body.png");
         projectileTexture = new Texture("projectile_0.png"); // Make sure this exists
         Tony_face=new Texture("Apple_face_0.png");
         sprite = new Sprite(Texture_Tony);
         sprite.setSize(1, 1);
-        sprite.setPosition(1, 1);
+        sprite.setPosition(2, 2);
         sprite_face = new Sprite(Tony_face);
         sprite_face.setSize(1, 1);
-        sprite_face.setPosition(1, 1);
-
+        sprite_face.setPosition(2, 2);
+        this.health=health;
         projectiles = new ArrayList<>();
     }
 
@@ -168,5 +167,13 @@ public class Protagonist {
         projectileTexture.dispose();
         Texture_Tony.dispose();
         Tony_face.dispose();
+    }
+
+    public float getCooldownPercent() {
+        if (timeSinceLastShot > shootCooldown)
+            return 1f;
+        else {
+            return timeSinceLastShot / shootCooldown;
+        }
     }
 }

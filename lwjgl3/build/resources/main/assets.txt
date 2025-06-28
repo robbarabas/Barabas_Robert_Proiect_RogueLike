@@ -3,9 +3,13 @@ Apple_body.png
 Apple_face_0.png
 ChelseaMarket-Regular.ttf
 Coin.png
+Health.png
 background_0.png
+crosshair.png
 enemy_0_body.png
 enemy_0_face.png
+enemy_1_body.png
+enemy_1_face.png
 projectile_0.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
@@ -14,3 +18,4 @@ ui/font.fnt
 ui/uiskin.atlas
 ui/uiskin.json
 ui/uiskin.png
+wall_0.png
