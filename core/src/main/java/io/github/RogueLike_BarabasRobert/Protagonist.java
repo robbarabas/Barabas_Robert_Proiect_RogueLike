@@ -18,12 +18,17 @@ public class Protagonist {
     Sprite sprite_face;
     Texture projectileTexture;
     List<Projectile> projectiles;
+    List<Weapon> inventory = new ArrayList<>();
+    int currentWeaponIndex = 0;
+
 
     float shootCooldown = 0.2f;
     float timeSinceLastShot = 0;
     public float speed=5.5f;
     public int health ;
-    public float power=2;
+    public float power=1;
+    public int projectile_multiplier=2;
+    private GameUI gameUI;
 
     public void takeDamage(int amount) {
         health -= amount;
@@ -47,7 +52,7 @@ public class Protagonist {
     }
 
 
-    public Protagonist(int health) {
+    public Protagonist(int health,GameUI ui) {
         Texture_Tony = new Texture("Apple_body.png");
         projectileTexture = new Texture("projectile_0.png"); // Make sure this exists
         Tony_face=new Texture("Apple_face_0.png");
@@ -57,8 +62,15 @@ public class Protagonist {
         sprite_face = new Sprite(Tony_face);
         sprite_face.setSize(1, 1);
         sprite_face.setPosition(2, 2);
+        gameUI=ui;
         this.health=health;
         projectiles = new ArrayList<>();
+        Weapon gun = new GunWeapon(projectileTexture,this);
+        Weapon shotgun = new ShotGunWeapon(projectileTexture,this);
+        inventory.add(gun);
+        inventory.add(shotgun);
+
+
     }
 
     public void update(float delta, List<Wall> walls) {
@@ -94,10 +106,7 @@ public class Protagonist {
         }
 
         timeSinceLastShot += delta;
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && timeSinceLastShot >= shootCooldown) {
-            shoot();
-            timeSinceLastShot = 0;
-        }
+
 
         // Update projectiles
         Iterator<Projectile> iter = projectiles.iterator();
@@ -108,8 +117,24 @@ public class Protagonist {
                 iter.remove();
             }
         }
+        // use weapon
+        Weapon current = inventory.get(currentWeaponIndex);
+        current.update(delta);
 
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && current.canUse()) {
+            current.use(this);
+        }
+
+// Switch weapons with Q/E
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            currentWeaponIndex = (currentWeaponIndex - 1 + inventory.size()) % inventory.size();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            currentWeaponIndex = (currentWeaponIndex + 1) % inventory.size();
+        }
+        gameUI.setWeaponIcon(inventory.get(currentWeaponIndex).weaponIcon);
     }
+
     private void rotate_around_cursor(Sprite spr,float newX,float newY)
     {
         // Offset face 0.1 units up (optional)
@@ -129,27 +154,7 @@ public class Protagonist {
         spr.setOriginCenter();
     }
 
-    private void shoot() {
-        // Convert mouse position to world coordinates
-        float mouseX = Gdx.input.getX();
-        float mouseY = Gdx.input.getY();
-        // Invert Y because LibGDX screen origin is bottom-left, but input is top-left
-        float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
-        float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
 
-        // Get protagonist center
-        float startX = sprite.getX() + sprite.getWidth() / 2f;
-        float startY = sprite.getY() + sprite.getHeight() / 2f;
-
-        // Calculate direction
-        float dirX = worldMouseX - startX;
-        float dirY = worldMouseY - startY;
-        float length = (float)Math.sqrt(dirX * dirX + dirY * dirY);
-        dirX /= length;
-        dirY /= length;
-
-        projectiles.add(new Projectile(startX, startY, dirX, dirY, projectileTexture));
-    }
 
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
@@ -175,5 +180,9 @@ public class Protagonist {
         else {
             return timeSinceLastShot / shootCooldown;
         }
+    }
+
+    public Weapon getCurrentWeapon() {
+        return inventory.get(currentWeaponIndex);
     }
 }

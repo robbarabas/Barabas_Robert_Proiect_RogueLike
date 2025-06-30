@@ -16,7 +16,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class FirstScreen implements Screen {
 
     final Main game;
-    GameUI ui;
+    public GameUI ui;
     Protagonist Tony;
     SpriteBatch spriteBatch;
     FitViewport viewport;
@@ -45,7 +45,7 @@ public class FirstScreen implements Screen {
         ui = new GameUI();
         GameUI.setCrosshairCursor("crosshair.png", 16, 16);
         Gdx.input.setInputProcessor(new InputMultiplexer(ui.getStage())); // For UI input
-        Tony = new Protagonist(game.health);
+        Tony = new Protagonist(game.health,ui);
         coinCount=game.totalCoins;
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(16, 10);
@@ -232,10 +232,12 @@ public class FirstScreen implements Screen {
     }
 
     private void drawUI() {
-        ui.update(coinCount, Tony.health);
-        ui.setCooldown(Tony.getCooldownPercent());
+        Weapon currentWeapon = Tony.getCurrentWeapon();
+        ui.setWeaponIcon(currentWeapon.getWeaponIcon());
+        ui.setWeaponName(currentWeapon.getName());
+        ui.setCooldown(currentWeapon.getCooldownPercent());
         ui.setCooldownBarPosition(new Vector2(Tony.getX() + 0.5f, Tony.getY() + 1.5f), viewport);
-
+        ui.update(coinCount, Tony.health);
         ui.render();
     }
 

@@ -16,7 +16,7 @@ public class Enemy {
 
     float damageCooldown = 1f;
     float timeSinceLastHit = 0f;
-    float health = 3;
+    float health = 5;
 
     // Knockback and hit effect
     float knockbackX = 0;
