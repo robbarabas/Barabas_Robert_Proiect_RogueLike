@@ -59,6 +59,9 @@ public class Enemy {
             if (!collides) {
                 sprite.setPosition(newX, newY);
             }
+            else {
+                pushOutFromWalls(walls);
+            }
             knockbackTime -= delta;
 
         } else {
@@ -222,13 +225,13 @@ public class Enemy {
 
                 // Push out along minimal overlap axis
                 if (minOverlap == overlapLeft) {
-                    moveBy(-overlapLeft, 0);
+                    moveBy(-overlapLeft-0.5f, 0);
                 } else if (minOverlap == overlapRight) {
                     moveBy(overlapRight, 0);
                 } else if (minOverlap == overlapTop) {
-                    moveBy(0, overlapTop);
+                    moveBy(0, overlapTop+0.5f);
                 } else if (minOverlap == overlapBottom) {
-                    moveBy(0, -overlapBottom);
+                    moveBy(0, -overlapBottom-0.5f);
                 }
 
                 // Update bounds after pushing out

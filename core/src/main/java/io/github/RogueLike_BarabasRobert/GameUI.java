@@ -82,12 +82,9 @@ public class GameUI {
         panel.add(coinIcon).size(48, 48).padRight(5);
         panel.add(coinLabel).left();
 
-        panel.row().padTop(10);
-        panel.add(new Label("Weapon", skin)).left().padRight(5);
-        panel.add(weaponIconImage).size(64, 64).padRight(5);
+        panel.row().padTop(5);
+        panel.add(weaponIconImage).size(80, 80).padRight(5);
 
-        panel.row().padTop(10);
-        panel.add(weaponNameLabel).left().colspan(2);
 
         stage.addActor(panel);
     }

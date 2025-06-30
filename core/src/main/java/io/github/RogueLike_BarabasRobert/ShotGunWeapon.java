@@ -2,19 +2,20 @@ package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 public class ShotGunWeapon extends Weapon {
     Texture projectileTexture;
     Protagonist owner;
     int pelletsPerShot = 5; // Total projectiles per shot
     float spreadAngle = 50f; // Total spread angle in degrees
-
+    Vector2 tip;
 
     public ShotGunWeapon(Texture projectileTexture, Protagonist owner) {
         super("Shotgun", 0.3f); // Cooldown time between shots
         this.owner = owner;
         this.projectileTexture = projectileTexture;
-        this.weaponIcon=new Texture("wall_0.png");
+        this.weaponIcon=new Texture("shotgun.png");
     }
 
     @Override
@@ -45,8 +46,9 @@ public class ShotGunWeapon extends Weapon {
 
             float dx = (float) Math.cos(angle);
             float dy = (float) Math.sin(angle);
+             tip = owner.getWeaponTipPosition();
 
-            owner.getProjectiles().add(new Projectile(startX, startY, dx, dy, projectileTexture));
+            owner.getProjectiles().add(new Projectile(tip.x, tip.y, dx, dy, projectileTexture));
         }
     }
 }

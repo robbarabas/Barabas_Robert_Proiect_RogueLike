@@ -32,6 +32,12 @@ public class Projectile {
         sprite.setPosition(x, y);
     }
 
+    public Projectile(float x, float y, float dirX, float dirY, Texture texture,float size_x,float size_y)
+    {
+        this(x,y,dirX,dirY,texture);
+        this.sprite.setSize(size_x,size_y);
+    }
+
     public void update(float delta) {
         x += dx * delta;
         y += dy * delta;
@@ -59,4 +65,5 @@ public class Projectile {
     public void onHit() {
         hasHit = true;
     }
+
 }

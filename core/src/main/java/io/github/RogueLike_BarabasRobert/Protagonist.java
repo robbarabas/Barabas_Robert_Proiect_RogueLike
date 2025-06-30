@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,13 +17,14 @@ public class Protagonist {
     Texture Tony_face;
     Sprite sprite;
     Sprite sprite_face;
+    Sprite Weapon;
     Texture projectileTexture;
     List<Projectile> projectiles;
     List<Weapon> inventory = new ArrayList<>();
     int currentWeaponIndex = 0;
 
 
-    float shootCooldown = 0.2f;
+
     float timeSinceLastShot = 0;
     public float speed=5.5f;
     public int health ;
@@ -54,7 +56,7 @@ public class Protagonist {
 
     public Protagonist(int health,GameUI ui) {
         Texture_Tony = new Texture("Apple_body.png");
-        projectileTexture = new Texture("projectile_0.png"); // Make sure this exists
+
         Tony_face=new Texture("Apple_face_0.png");
         sprite = new Sprite(Texture_Tony);
         sprite.setSize(1, 1);
@@ -65,10 +67,12 @@ public class Protagonist {
         gameUI=ui;
         this.health=health;
         projectiles = new ArrayList<>();
-        Weapon gun = new GunWeapon(projectileTexture,this);
-        Weapon shotgun = new ShotGunWeapon(projectileTexture,this);
+        Weapon gun = new GunWeapon(new Texture("arrow.png"),this);
+        Weapon shotgun = new ShotGunWeapon(new Texture("projectile_0.png"),this);
+        Weapon=new Sprite(gun.getWeaponIcon());
         inventory.add(gun);
         inventory.add(shotgun);
+
 
 
     }
@@ -133,32 +137,55 @@ public class Protagonist {
             currentWeaponIndex = (currentWeaponIndex + 1) % inventory.size();
         }
         gameUI.setWeaponIcon(inventory.get(currentWeaponIndex).weaponIcon);
-    }
-
-    private void rotate_around_cursor(Sprite spr,float newX,float newY)
-    {
-        // Offset face 0.1 units up (optional)
-        spr.setPosition(newX, newY + 0.1f);
-
-// Point face toward cursor (optional)
-        float centerX = newX + sprite.getWidth() / 2f;
-        float centerY = newY + sprite.getHeight() / 2f;
-
+        Weapon=new Sprite(inventory.get(currentWeaponIndex).weaponIcon);
+        Weapon.setSize(1f,1f);
         float mouseX = Gdx.input.getX();
         float mouseY = Gdx.input.getY();
+        rotate_around_cursor(Weapon,mouseX,mouseY);
+    }
+
+
+    private void rotate_around_cursor(Sprite spr, float mouseX, float mouseY) {
+        // Convert mouse screen coords to world coords
         float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
         float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
 
-        float angle = (float)Math.toDegrees(Math.atan2(worldMouseY - centerY, worldMouseX - centerX));
+        // Get protagonist center
+        float centerX = sprite.getX() + sprite.getWidth() / 2f;
+        float centerY = sprite.getY() + sprite.getHeight() / 2f;
+
+        // Calculate angle to mouse
+        float angle = (float)Math.toDegrees(Math.atan2(worldMouseY - centerY, worldMouseX - centerX))-45.2f;
+
+        // Position weapon near player, e.g., slightly in front of them (optional tweak)
+        float weaponOffset = 0.4f;
+        float offsetX = (float)Math.cos(Math.toRadians(angle)) * weaponOffset;
+        float offsetY = (float)Math.sin(Math.toRadians(angle)) * weaponOffset;
+        spr.setPosition(centerX + offsetX - spr.getWidth() / 2f, centerY + offsetY - spr.getHeight() / 2f);
+
+        // Rotate and center
         spr.setRotation(angle);
         spr.setOriginCenter();
     }
 
+    public Vector2 getWeaponTipPosition() {
+        float angleDeg = Weapon.getRotation()-45f;
+        float angleRad = (float) Math.toRadians(angleDeg);
 
+        // Distance from weapon center to tip (adjust if needed)
+        float tipOffset = Weapon.getWidth() / 2f;
+
+        // Calculate tip position using rotation and origin
+        float tipX = Weapon.getX() + Weapon.getOriginX() + (float)Math.cos(angleRad) * tipOffset;
+        float tipY = Weapon.getY() + Weapon.getOriginY() + (float)Math.sin(angleRad) * tipOffset;
+
+        return new Vector2(tipX, tipY);
+    }
 
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
         sprite_face.draw(batch);
+        Weapon.draw(batch);
         for (Projectile p : projectiles) {
             p.render(batch);
         }
@@ -174,13 +201,7 @@ public class Protagonist {
         Tony_face.dispose();
     }
 
-    public float getCooldownPercent() {
-        if (timeSinceLastShot > shootCooldown)
-            return 1f;
-        else {
-            return timeSinceLastShot / shootCooldown;
-        }
-    }
+
 
     public Weapon getCurrentWeapon() {
         return inventory.get(currentWeaponIndex);

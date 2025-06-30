@@ -41,4 +41,5 @@ public abstract class Weapon {
     public String getName() {
         return name;
     }
+
 }

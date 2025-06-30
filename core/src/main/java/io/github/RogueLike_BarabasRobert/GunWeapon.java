@@ -19,7 +19,7 @@ public class GunWeapon extends Weapon {
         Owner = owner;
         burstCount=owner.projectile_multiplier;
         this.projectileTexture = projectileTexture;
-        this.weaponIcon=new Texture("projectile_0.png");
+        this.weaponIcon=new Texture("burst_weapon.png");
     }
 
     @Override
@@ -68,6 +68,6 @@ public class GunWeapon extends Weapon {
         dirX /= len;
         dirY /= len;
 
-        owner.getProjectiles().add(new Projectile(startX, startY, dirX, dirY, projectileTexture));
+        owner.getProjectiles().add(new Projectile(startX, startY, dirX, dirY, projectileTexture,1,1));
     }
 }

@@ -25,6 +25,7 @@ public class FirstScreen implements Screen {
     List<Coin> coins;
     List<Wall> walls;
     List<Projectile> enemyProjectiles = new ArrayList<>();
+    List<Vector2> ocupied_tiles=new ArrayList<>();
     BitmapFont font;
     int coinCount=0;
     boolean wallsBroken = false;
@@ -33,8 +34,9 @@ public class FirstScreen implements Screen {
     public FirstScreen(Main game) {
         this.game = game;
         initializeGameObjects();
-        initializeEnemies();
         generateBorderWalls();
+        initializeEnemies();
+
     }
     private void saveGame(int health, int coins) {
         FileHandle file = Gdx.files.local("save.txt");
@@ -65,29 +67,47 @@ public class FirstScreen implements Screen {
         coins = new ArrayList<>();
         enemies = new ArrayList<>();
 
-        // Random non-border walls
-        Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            float x = (int) (random.nextFloat() * 15f);
-            float y = (int) (random.nextFloat() * 9f);
-            if (x == 2 && y == 2) continue;
-            walls.add(new Wall(x, y, 1, 1));
-        }
+
     }
 
     private void initializeEnemies() {
+        spawnEnemies(3, 0); // melee enemies
+        spawnEnemies(2, 1);  // ranged enemies
+    }
+
+    private void spawnEnemies(int count, int Type) {
         Random random = new Random();
-        for (int i = 0; i < 5; i++) {
-            float x = random.nextFloat() * 8f;
-            float y = random.nextFloat() * 7f;
-            enemies.add(new Enemy(x+6, y+1, enemyTexture, enemyFace, Tony));
-        }
-        for (int i = 0; i < 3; i++) {
-            float x = random.nextFloat() * 8f;
-            float y = random.nextFloat() * 7f;
-            enemies.add(new EnemyRanged(x+6, y+1, enemyTexture_ranged, enemyFace_ranged,Tony, enemy_proj_0, enemyProjectiles));
+        float x, y;
+        boolean occupied;
+
+        for (int i = 0; i < count; i++) {
+            x = random.nextFloat() * 8f;
+            y = random.nextFloat() * 7f;
+
+            // Check if the tile is occupied
+            occupied = true;
+            while (occupied) {
+                occupied = false;
+                for (Vector2 tile : ocupied_tiles) {
+                    if (tile.x == x + 6 && tile.y == y + 1) {
+                        occupied = true;
+                        x = random.nextFloat() * 8f;
+                        y = random.nextFloat() * 7f;
+                        break;
+                    }
+                }
+            }
+
+            // Spawn the appropriate type of enemy
+            switch (Type) {
+                case(0): enemies.add(new EnemyRanged(x + 6, y + 1, enemyTexture_ranged, enemyFace_ranged, Tony, enemy_proj_0, enemyProjectiles));
+                break;
+                case(1): enemies.add(new Enemy(x + 6, y + 1, enemyTexture, enemyFace, Tony));
+                break;
+            }
         }
     }
+
 
     private void generateBorderWalls() {
         int worldWidth = 16;
@@ -96,6 +116,7 @@ public class FirstScreen implements Screen {
         for (int x = 0; x < worldWidth; x++) {
             walls.add(new Wall(x, 0, 1, 1)); // bottom
             walls.add(new Wall(x, worldHeight - 1, 1, 1)); // top
+
         }
 
         for (int y = 1; y < worldHeight - 1; y++) {
@@ -104,8 +125,19 @@ public class FirstScreen implements Screen {
                 walls.add(new Wall(worldWidth - 1, y, 1, 1, true)); // breakable exit
             } else {
                 walls.add(new Wall(worldWidth - 1, y, 1, 1,false));
+
             }
         }
+        // Random non-border walls
+        Random random = new Random();
+        for (int i = 0; i < 8; i++) {
+            float x = (int) (random.nextFloat() * 15f);
+            float y = (int) (random.nextFloat() * 9f);
+            if (x == 2 && y == 2) continue;
+            walls.add(new Wall(x, y, 1, 1));
+            ocupied_tiles.add(new Vector2(x,y));
+        }
+
     }
 
     @Override
@@ -127,8 +159,8 @@ public class FirstScreen implements Screen {
         if (wallsBroken && Tony.getBounds().overlaps(new Rectangle(15, 5, 1, 3))) {
             game.totalCoins = coinCount;
             game.health = Tony.health;
-            saveGame(game.health, game.totalCoins);
-            game.setScreen(new FirstScreen(game)); // Or repeat FirstScreen with variations
+            game.autoSave();
+            game.setScreen(new FirstScreen(game));
         }
 
         drawWorld();
@@ -191,6 +223,7 @@ public class FirstScreen implements Screen {
     }
 
     private void handleCollisions() {
+        //coins
         coins.removeIf(coin -> {
             if (coin.getBounds().overlaps(Tony.getBounds())) {
                 coinCount++;
@@ -203,6 +236,7 @@ public class FirstScreen implements Screen {
     private void updateEnemies(float delta) {
         for (Enemy e : enemies) {
             e.update(delta, walls);
+            e.pushOutFromWalls(walls);
         }
     }
 
@@ -230,6 +264,7 @@ public class FirstScreen implements Screen {
 
         spriteBatch.end();
     }
+
 
     private void drawUI() {
         Weapon currentWeapon = Tony.getCurrentWeapon();

@@ -4,13 +4,17 @@ Apple_face_0.png
 ChelseaMarket-Regular.ttf
 Coin.png
 Health.png
+arrow.png
 background_0.png
+burst_weapon.kra
+burst_weapon.png
 crosshair.png
 enemy_0_body.png
 enemy_0_face.png
 enemy_1_body.png
 enemy_1_face.png
 projectile_0.png
+shotgun.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
 ui/font-window.fnt

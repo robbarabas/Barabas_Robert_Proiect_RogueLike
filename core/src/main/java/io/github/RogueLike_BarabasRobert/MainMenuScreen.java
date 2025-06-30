@@ -2,22 +2,21 @@ package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.files.FileHandle;
 
 public class MainMenuScreen extends ScreenAdapter {
     final Main game;
     Stage stage;
     Skin skin;
     InputMultiplexer multiplexer = new InputMultiplexer();
+    FileHandle savesDir;
 
     public MainMenuScreen(Main game) {
         this.game = game;
@@ -27,29 +26,76 @@ public class MainMenuScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
 
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        savesDir = Gdx.files.local("saves/");
+        if (!savesDir.exists()) {
+            savesDir.mkdirs();
+        }
 
-        // === Start Button ===
-        TextButton startButton = new TextButton("Start Game", skin);
+        // === UI Components ===
+        TextField saveNameInput = new TextField("", skin);
+        saveNameInput.setMessageText("Enter save name");
+
+        SelectBox<String> saveSelect = new SelectBox<>(skin);
+        saveSelect.setItems(getSaveNames());
+
+        // === Start Game Button ===
+        TextButton startButton = new TextButton("Start Game (No Load)", skin);
         startButton.addListener(new ClickListener() {
-            @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.currentSaveName = "autosave"; // default autosave name
+                game.autoSave(); // save initial state
                 game.setScreen(new FirstScreen(game));
             }
         });
 
-        // === Load Game Button ===
-        TextButton loadButton = new TextButton("Load Game", skin);
-        loadButton.addListener(new ClickListener() {
-            @Override
+        // === Create Save Button ===
+        TextButton createSaveButton = new TextButton("Create New Save", skin);
+        createSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                int[] values = loadGame();
-                if (values != null) {
-                    game.health = values[0];
-                    game.totalCoins = values[1];
-                    game.setScreen(new FirstScreen(game));
-                    System.out.println("Loaded health: " + values[0] + ", coins: " + values[1]);
-                } else {
-                    System.out.println("No saved game found.");
+                String name = saveNameInput.getText().trim();
+                if (!name.isEmpty()) {
+                    FileHandle file = savesDir.child(name + ".save");
+                    file.writeString(game.health + "," + game.totalCoins, false);
+                    saveSelect.setItems(getSaveNames());
+                    System.out.println("Saved game as: " + name);
+                    game.currentSaveName=name;
+                }
+            }
+        });
+
+        // === Load Save Button ===
+        TextButton loadSaveButton = new TextButton("Load Save", skin);
+        loadSaveButton.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                String selected = saveSelect.getSelected();
+                if (selected != null && !selected.isEmpty()) {
+                    int[] values = loadGame(selected);
+                    if (values != null) {
+                        game.health = values[0];
+                        game.totalCoins = values[1];
+                        game.currentSaveName = selected; // set active save
+                        game.autoSave(); // optional initial save
+                        game.setScreen(new FirstScreen(game));
+                        System.out.println("Loaded: " + selected);
+                    } else {
+                        System.out.println("Failed to load selected save.");
+                    }
+                }
+            }
+        });
+
+        // === Delete Save Button ===
+        TextButton deleteSaveButton = new TextButton("Delete Save", skin);
+        deleteSaveButton.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                String selected = saveSelect.getSelected();
+                if (selected != null && !selected.isEmpty()) {
+                    FileHandle file = savesDir.child(selected + ".save");
+                    if (file.exists()) {
+                        file.delete();
+                        saveSelect.setItems(getSaveNames());
+                        System.out.println("Deleted save: " + selected);
+                    }
                 }
             }
         });
@@ -58,7 +104,6 @@ public class MainMenuScreen extends ScreenAdapter {
         SelectBox<String> resolutionSelect = new SelectBox<>(skin);
         resolutionSelect.setItems("800x600", "1280x720", "1920x1080");
         resolutionSelect.setSelected("1280x720");
-
         resolutionSelect.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -74,31 +119,30 @@ public class MainMenuScreen extends ScreenAdapter {
         table.setFillParent(true);
         table.center();
 
-        table.add(startButton).width(200).height(60).padBottom(20).row();
-        table.add(loadButton).width(200).height(60).padBottom(20).row();
+        table.add(startButton).width(220).height(50).padBottom(15).row();
+        table.add(new Label("Save Name:", skin)).padBottom(5).row();
+        table.add(saveNameInput).width(220).padBottom(10).row();
+        table.add(createSaveButton).width(220).height(40).padBottom(10).row();
+        table.add(new Label("Select Save:", skin)).padBottom(5).row();
+        table.add(saveSelect).width(220).padBottom(10).row();
+        table.add(loadSaveButton).width(220).height(40).padBottom(10).row();
+        table.add(deleteSaveButton).width(220).height(40).padBottom(20).row();
+        table.add(resolutionSelect).width(220).height(40).row();
 
-        TextButton deleteButton = new TextButton("Delete Save", skin);
-        deleteButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                FileHandle file = Gdx.files.local("save.txt");
-                if (file.exists()) {
-                    file.delete();
-                    System.out.println("Save deleted.");
-                } else {
-                    System.out.println("No save to delete.");
-                }
-            }
-        });
-
-        table.add(deleteButton).width(200).height(60).padBottom(20).row();
-        table.add(resolutionSelect).width(200).height(50).row();
         stage.addActor(table);
     }
 
-    private int[] loadGame() {
+    private String[] getSaveNames() {
+        FileHandle[] files = savesDir.list();
+        return java.util.Arrays.stream(files)
+            .filter(f -> f.extension().equals("save"))
+            .map(FileHandle::nameWithoutExtension)
+            .toArray(String[]::new);
+    }
+
+    private int[] loadGame(String name) {
         try {
-            FileHandle file = Gdx.files.local("save.txt");
+            FileHandle file = savesDir.child(name + ".save");
             if (!file.exists()) return null;
 
             String[] parts = file.readString().trim().split(",");
@@ -106,7 +150,7 @@ public class MainMenuScreen extends ScreenAdapter {
             int coins = Integer.parseInt(parts[1]);
             return new int[]{health, coins};
         } catch (Exception e) {
-            System.err.println("Failed to load game: " + e.getMessage());
+            System.err.println("Failed to load save: " + e.getMessage());
             return null;
         }
     }
@@ -135,4 +179,5 @@ public class MainMenuScreen extends ScreenAdapter {
         stage.dispose();
         skin.dispose();
     }
+
 }
