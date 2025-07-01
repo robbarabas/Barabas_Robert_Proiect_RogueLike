@@ -69,7 +69,6 @@ Important data is stored in the `saves` folder and contains information such as:
 
 ### How to Use
 
-```bash
 - Run the Rogue.jar
 - Start the game or load a previous save
 - Controls:
@@ -78,7 +77,6 @@ Important data is stored in the `saves` folder and contains information such as:
   - **Q/E** - Switch weapons
 ```
 
----
 
 ## Conclusion
 
