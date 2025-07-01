@@ -39,7 +39,7 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
   - Krita (drawing sprites)
 ---
 ### Aplication Prezentation
-## Logic Structure
+###Logic Structure
 
 ```
 MainGame
@@ -55,7 +55,7 @@ MainGame
      ├── Pick-ups (coins/shopitems)
      └── Walls
 ```
-## Data Mangement
+###Data Mangement
 ```
 Important data is stored in the folder saves and contains information such as :
 -stage number
@@ -63,7 +63,7 @@ Important data is stored in the folder saves and contains information such as :
 -coins
 -etc...
 ```
-## How to use ?
+### How to use ?
 ```
 -Run the Rogue.jar
 -Start the game or make a save or load a previous save 
