@@ -1,5 +1,5 @@
 # An Aplle a Day keeps the enemies at bay
-# 🕹️ A.D.K.E.B: A 2D Dungeon roguelite game
+# A.D.K.E.B: A 2D Dungeon roguelite game
 
 ### Developed by Barabas Robert Ilie| Java + LibGDX | 2025
 

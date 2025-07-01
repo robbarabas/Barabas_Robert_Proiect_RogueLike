@@ -11,13 +11,37 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.InputMultiplexer;
 
+/**
+ * Main menu screen for the RogueLike game.
+ *
+ * This screen provides the player with options to start a new game,
+ * create a new save, load an existing save, delete saves, and change
+ * the game resolution. It uses LibGDX's Scene2D UI framework for
+ * the interface.
+ */
 public class MainMenuScreen extends ScreenAdapter {
+
+    /** Reference to the main game class, for changing screens and accessing game state. */
     final Main game;
+
+    /** The stage that holds the UI actors and handles input/events. */
     Stage stage;
+
+    /** UI skin for styling widgets. */
     Skin skin;
+
+    /** Handles multiple input processors simultaneously, including the stage input. */
     InputMultiplexer multiplexer = new InputMultiplexer();
+
+    /** Directory where save files are stored. */
     FileHandle savesDir;
 
+    /**
+     * Constructs the main menu screen, initializes UI components,
+     * loads existing saves, and sets up event listeners.
+     *
+     * @param game The main game instance
+     */
     public MainMenuScreen(Main game) {
         this.game = game;
 
@@ -31,55 +55,58 @@ public class MainMenuScreen extends ScreenAdapter {
             savesDir.mkdirs();
         }
 
-        // === UI Components ===
+        // UI Components
         TextField saveNameInput = new TextField("", skin);
         saveNameInput.setMessageText("Enter save name");
 
         SelectBox<String> saveSelect = new SelectBox<>(skin);
         saveSelect.setItems(getSaveNames());
 
-        // === Start Game Button ===
+        // Start Game button - begins a new game without loading a save
         TextButton startButton = new TextButton("Start Game (No Load)", skin);
         startButton.addListener(new ClickListener() {
-
             public void clicked(InputEvent event, float x, float y) {
+                // Reset game state to defaults
                 game.totalCoins = 0;
                 game.health = 10;
-                game.max_health=10;
-                game.power=1;
-                game.projectile_multiplier=2;
-                game.stage=1;
-                game.enemiesKilled=0;
-                game.totalCoinsEarned=0;
+                game.max_health = 10;
+                game.power = 1;
+                game.projectile_multiplier = 2;
+                game.stage = 1;
+                game.enemiesKilled = 0;
+                game.totalCoinsEarned = 0;
                 game.currentSaveName = "autosave"; // default autosave name
                 game.autoSave(); // save initial state
                 game.setScreen(new FirstScreen(game));
             }
         });
 
-        // === Create Save Button ===
+        // Create Save button - saves the current game state under the name entered
         TextButton createSaveButton = new TextButton("Create New Save", skin);
         createSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 String name = saveNameInput.getText().trim();
                 if (!name.isEmpty()) {
                     FileHandle file = savesDir.child(name + ".save");
-                    file.writeString(game.health + "," +
-                        game.totalCoins + "," +
-                        game.max_health + "," +
-                        game.power + "," +
-                        game.projectile_multiplier + "," +
-                        game.stage + "," +
-                        game.totalCoinsEarned + "," +
-                        game.enemiesKilled, false);
+                    file.writeString(
+                        game.health + "," +
+                            game.totalCoins + "," +
+                            game.max_health + "," +
+                            game.power + "," +
+                            game.projectile_multiplier + "," +
+                            game.stage + "," +
+                            game.totalCoinsEarned + "," +
+                            game.enemiesKilled,
+                        false
+                    );
                     saveSelect.setItems(getSaveNames());
                     System.out.println("Saved game as: " + name);
-                    game.currentSaveName=name;
+                    game.currentSaveName = name;
                 }
             }
         });
 
-        // === Load Save Button ===
+        // Load Save button - loads selected save file into game state
         TextButton loadSaveButton = new TextButton("Load Save", skin);
         loadSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
@@ -89,12 +116,12 @@ public class MainMenuScreen extends ScreenAdapter {
                     if (values != null) {
                         game.health = values[0];
                         game.totalCoins = values[1];
-                        game.max_health=values[2];
-                        game.power=values[3];
-                        game.projectile_multiplier=values[4];
-                        game.stage=values[5];
-                        game.totalCoinsEarned=values[6];
-                      game.enemiesKilled=values[7];
+                        game.max_health = values[2];
+                        game.power = values[3];
+                        game.projectile_multiplier = values[4];
+                        game.stage = values[5];
+                        game.totalCoinsEarned = values[6];
+                        game.enemiesKilled = values[7];
                         game.currentSaveName = selected; // set active save
                         game.autoSave(); // optional initial save
                         game.setScreen(new FirstScreen(game));
@@ -106,8 +133,7 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-
-        // === Delete Save Button ===
+        // Delete Save button - deletes the selected save file
         TextButton deleteSaveButton = new TextButton("Delete Save", skin);
         deleteSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
@@ -123,7 +149,7 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-        // === Resolution Selector ===
+        // Resolution selector - changes the window size to the selected resolution
         SelectBox<String> resolutionSelect = new SelectBox<>(skin);
         resolutionSelect.setItems("800x600", "1280x720", "1920x1080");
         resolutionSelect.setSelected("1280x720");
@@ -137,7 +163,7 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-        // === Layout ===
+        // Layout the UI components in a table centered on the stage
         Table table = new Table();
         table.setFillParent(true);
         table.center();
@@ -155,6 +181,12 @@ public class MainMenuScreen extends ScreenAdapter {
         stage.addActor(table);
     }
 
+    /**
+     * Returns the list of save names (without file extensions) found
+     * in the saves directory.
+     *
+     * @return Array of save names as Strings
+     */
     private String[] getSaveNames() {
         FileHandle[] files = savesDir.list();
         return java.util.Arrays.stream(files)
@@ -163,6 +195,16 @@ public class MainMenuScreen extends ScreenAdapter {
             .toArray(String[]::new);
     }
 
+    /**
+     * Loads a saved game state from the file with the given name.
+     *
+     * The save file should contain comma-separated integers representing:
+     * health, totalCoins, max_health, power, projectile_multiplier,
+     * stage, totalCoinsEarned, enemiesKilled (in that order).
+     *
+     * @param name The save file name (without extension)
+     * @return An int array containing the loaded values, or null if loading fails
+     */
     private int[] loadGame(String name) {
         try {
             FileHandle file = savesDir.child(name + ".save");
@@ -170,10 +212,9 @@ public class MainMenuScreen extends ScreenAdapter {
 
             String[] parts = file.readString().trim().split(",");
 
-            int []values=new int[8];
-            for(int i=0;i<=7;i++)
-            {
-               values[i] =Integer.parseInt(parts[i]);
+            int[] values = new int[8];
+            for (int i = 0; i <= 7; i++) {
+                values[i] = Integer.parseInt(parts[i]);
             }
 
             return values;
@@ -183,11 +224,20 @@ public class MainMenuScreen extends ScreenAdapter {
         }
     }
 
+    /**
+     * Called when this screen is no longer the current screen.
+     * Resets the input processor to null.
+     */
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
     }
 
+    /**
+     * Called every frame to clear the screen and draw the stage actors.
+     *
+     * @param delta Time in seconds since the last frame
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -197,15 +247,23 @@ public class MainMenuScreen extends ScreenAdapter {
         stage.draw();
     }
 
+    /**
+     * Handles screen resizing events and updates the viewport accordingly.
+     *
+     * @param width  New screen width in pixels
+     * @param height New screen height in pixels
+     */
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    /**
+     * Releases all resources managed by this screen.
+     */
     @Override
     public void dispose() {
         stage.dispose();
         skin.dispose();
     }
-
 }
