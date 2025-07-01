@@ -4,12 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.InputMultiplexer;
+
+import static com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable.draw;
 
 /**
  * Main menu screen for the RogueLike game.
@@ -35,6 +40,10 @@ public class MainMenuScreen extends ScreenAdapter {
 
     /** Directory where save files are stored. */
     FileHandle savesDir;
+    /** Texture for background. */
+    Texture backgroundTexture;
+    /** Batch to render background. */
+    SpriteBatch backgroundBatch;
 
     /**
      * Constructs the main menu screen, initializes UI components,
@@ -44,7 +53,8 @@ public class MainMenuScreen extends ScreenAdapter {
      */
     public MainMenuScreen(Main game) {
         this.game = game;
-
+        backgroundTexture = new Texture(Gdx.files.internal("background_menu.png"));
+        backgroundBatch = new SpriteBatch();
         stage = new Stage(new ScreenViewport());
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
@@ -58,15 +68,26 @@ public class MainMenuScreen extends ScreenAdapter {
         // UI Components
         TextField saveNameInput = new TextField("", skin);
         saveNameInput.setMessageText("Enter save name");
+        saveNameInput.setTextFieldListener((textField, c) -> {});
+        saveNameInput.sizeBy(1.5f);
 
         SelectBox<String> saveSelect = new SelectBox<>(skin);
         saveSelect.setItems(getSaveNames());
+        saveSelect.getList().sizeBy(1.5f);
+        saveSelect.getStyle().font.getData().setScale(1.5f);
 
-        // Start Game button - begins a new game without loading a save
+        // Labels
+        Label saveLabel = new Label("Save Name:", skin);
+        saveLabel.setFontScale(1.5f);
+
+        Label selectSaveLabel = new Label("Select Save:", skin);
+        selectSaveLabel.setFontScale(1.5f);
+
+        // Buttons
         TextButton startButton = new TextButton("Start Game (No Load)", skin);
+        startButton.getLabel().setFontScale(1.6f);
         startButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                // Reset game state to defaults
                 game.totalCoins = 0;
                 game.health = 10;
                 game.max_health = 10;
@@ -75,14 +96,14 @@ public class MainMenuScreen extends ScreenAdapter {
                 game.stage = 1;
                 game.enemiesKilled = 0;
                 game.totalCoinsEarned = 0;
-                game.currentSaveName = "autosave"; // default autosave name
-                game.autoSave(); // save initial state
+                game.currentSaveName = "autosave";
+                game.autoSave();
                 game.setScreen(new FirstScreen(game));
             }
         });
 
-        // Create Save button - saves the current game state under the name entered
         TextButton createSaveButton = new TextButton("Create New Save", skin);
+        createSaveButton.getLabel().setFontScale(1.6f);
         createSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 String name = saveNameInput.getText().trim();
@@ -100,14 +121,14 @@ public class MainMenuScreen extends ScreenAdapter {
                         false
                     );
                     saveSelect.setItems(getSaveNames());
-                    System.out.println("Saved game as: " + name);
                     game.currentSaveName = name;
+                    System.out.println("Saved game as: " + name);
                 }
             }
         });
 
-        // Load Save button - loads selected save file into game state
         TextButton loadSaveButton = new TextButton("Load Save", skin);
+        loadSaveButton.getLabel().setFontScale(1.6f);
         loadSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 String selected = saveSelect.getSelected();
@@ -122,8 +143,8 @@ public class MainMenuScreen extends ScreenAdapter {
                         game.stage = values[5];
                         game.totalCoinsEarned = values[6];
                         game.enemiesKilled = values[7];
-                        game.currentSaveName = selected; // set active save
-                        game.autoSave(); // optional initial save
+                        game.currentSaveName = selected;
+                        game.autoSave();
                         game.setScreen(new FirstScreen(game));
                         System.out.println("Loaded: " + selected);
                     } else {
@@ -133,8 +154,8 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-        // Delete Save button - deletes the selected save file
         TextButton deleteSaveButton = new TextButton("Delete Save", skin);
+        deleteSaveButton.getLabel().setFontScale(1.6f);
         deleteSaveButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 String selected = saveSelect.getSelected();
@@ -149,10 +170,11 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-        // Resolution selector - changes the window size to the selected resolution
         SelectBox<String> resolutionSelect = new SelectBox<>(skin);
         resolutionSelect.setItems("800x600", "1280x720", "1920x1080");
         resolutionSelect.setSelected("1280x720");
+        resolutionSelect.getList().sizeBy(1.5f);
+        resolutionSelect.getStyle().font.getData().setScale(1.4f);
         resolutionSelect.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -163,20 +185,20 @@ public class MainMenuScreen extends ScreenAdapter {
             }
         });
 
-        // Layout the UI components in a table centered on the stage
+        // Layout
         Table table = new Table();
         table.setFillParent(true);
         table.center();
 
-        table.add(startButton).width(220).height(50).padBottom(15).row();
-        table.add(new Label("Save Name:", skin)).padBottom(5).row();
-        table.add(saveNameInput).width(220).padBottom(10).row();
-        table.add(createSaveButton).width(220).height(40).padBottom(10).row();
-        table.add(new Label("Select Save:", skin)).padBottom(5).row();
-        table.add(saveSelect).width(220).padBottom(10).row();
-        table.add(loadSaveButton).width(220).height(40).padBottom(10).row();
-        table.add(deleteSaveButton).width(220).height(40).padBottom(20).row();
-        table.add(resolutionSelect).width(220).height(40).row();
+        table.add(startButton).width(240).height(55).padBottom(15).row();
+        table.add(saveLabel).padBottom(5).row();
+        table.add(saveNameInput).width(240).padBottom(10).row();
+        table.add(createSaveButton).width(240).height(45).padBottom(10).row();
+        table.add(selectSaveLabel).padBottom(5).row();
+        table.add(saveSelect).width(240).padBottom(10).row();
+        table.add(loadSaveButton).width(240).height(45).padBottom(10).row();
+        table.add(deleteSaveButton).width(240).height(45).padBottom(20).row();
+        table.add(resolutionSelect).width(240).height(45).row();
 
         stage.addActor(table);
     }
@@ -224,10 +246,7 @@ public class MainMenuScreen extends ScreenAdapter {
         }
     }
 
-    /**
-     * Called when this screen is no longer the current screen.
-     * Resets the input processor to null.
-     */
+    /** Called when this screen is no longer the current screen. */
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
@@ -238,10 +257,16 @@ public class MainMenuScreen extends ScreenAdapter {
      *
      * @param delta Time in seconds since the last frame
      */
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        backgroundBatch.setProjectionMatrix(stage.getCamera().combined);
+        backgroundBatch.begin();
+        backgroundBatch.draw(backgroundTexture, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
+        backgroundBatch.end();
 
         stage.act(delta);
         stage.draw();
@@ -258,12 +283,14 @@ public class MainMenuScreen extends ScreenAdapter {
         stage.getViewport().update(width, height, true);
     }
 
-    /**
-     * Releases all resources managed by this screen.
-     */
+    /** Releases all resources managed by this screen. */
+
     @Override
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        backgroundTexture.dispose();
+        backgroundBatch.dispose();
     }
+
 }

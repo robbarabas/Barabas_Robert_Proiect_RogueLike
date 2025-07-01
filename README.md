@@ -5,7 +5,7 @@
 
 ---
 
-## Introduction ans Motivation
+## Introduction and Motivation
 
 This project is a 2D roguelike  game where the player navigates a dungeon filled with moving enemies. The primary motivation was to create a simple but functional game using Java and LibGDX, while implementing core game design principles like AI movement, collision detection, and game state management. 
 
@@ -40,7 +40,8 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
 ---
 
 
-###  Architecture & Structure
+###  Logic Structure
+
 ```
 MainGame
 ├── MainMenuScreen
@@ -55,6 +56,7 @@ MainGame
      ├── Pick-ups (coins/shopitems)
      └── Walls
 ```
+
 ## Platforms
 
 - `core`: Main module with the application logic shared by all platforms.

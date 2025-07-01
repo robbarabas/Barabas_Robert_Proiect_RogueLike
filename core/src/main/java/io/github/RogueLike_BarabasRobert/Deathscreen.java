@@ -71,8 +71,10 @@ public class Deathscreen implements Screen {
                 "Enemies Killed: " + enemiesKilled,
             skin
         );
+        stats.setFontScale(2f);
 
         TextButton mainMenuButton = new TextButton("Return to Main Menu", skin);
+        mainMenuButton.sizeBy(2f);
         mainMenuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -82,6 +84,7 @@ public class Deathscreen implements Screen {
 
         table.add(title).pad(10).row();
         table.add(stats).pad(10).row();
+        mainMenuButton.sizeBy(2f);
         table.add(mainMenuButton).pad(10);
     }
 

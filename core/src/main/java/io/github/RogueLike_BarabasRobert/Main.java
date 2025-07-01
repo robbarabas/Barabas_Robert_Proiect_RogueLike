@@ -123,8 +123,6 @@ public class Main extends Game {
     public void dispose() {
         if (spriteBatch != null) spriteBatch.dispose();
 
-        FileHandle file = Gdx.files.local("save.txt");
-        file.writeString(health + "," + totalCoins, false);
     }
 
     /**

@@ -6,6 +6,7 @@ Coin.png
 Health.png
 arrow.png
 background_0.png
+background_menu.png
 burst_weapon.kra
 burst_weapon.png
 crosshair.png
