@@ -16,7 +16,7 @@ public class Projectile {
     Texture texture;
     Sprite sprite;
 
-    public Projectile(float x, float y, float dirX, float dirY, Texture texture) {
+    public Projectile(float x, float y, float dirX, float dirY, Texture texture,float speed) {
         this.x = x;
         this.y = y;
         float length = (float)Math.sqrt(dirX * dirX + dirY * dirY);
@@ -25,6 +25,7 @@ public class Projectile {
         this.texture = texture;
         this.sprite = new Sprite(texture);
         this.sprite.setSize(0.5f, 0.5f);
+        this.speed=speed;
 
         float angle = (float) Math.toDegrees(Math.atan2(dirY, dirX));
         sprite.setRotation(angle);
@@ -32,9 +33,9 @@ public class Projectile {
         sprite.setPosition(x, y);
     }
 
-    public Projectile(float x, float y, float dirX, float dirY, Texture texture,float size_x,float size_y)
+    public Projectile(float x, float y, float dirX, float dirY, Texture texture,float speed,float size_x,float size_y)
     {
-        this(x,y,dirX,dirY,texture);
+        this(x,y,dirX,dirY,texture,speed);
         this.sprite.setSize(size_x,size_y);
     }
 
@@ -50,7 +51,8 @@ public class Projectile {
     }
 
     public Rectangle getBounds() {
-        return sprite.getBoundingRectangle();
+        Rectangle bounds=sprite.getBoundingRectangle();
+        return bounds.setSize(0.5f,0.3f);
     }
 
     public boolean isOffScreen() {

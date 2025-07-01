@@ -3,6 +3,7 @@ package io.github.RogueLike_BarabasRobert;
 import com.badlogic.gdx.graphics.Texture;
 
 public abstract class Weapon {
+    public float base_power=4;
     protected float cooldown;
     protected float timeSinceLastUse = 0;
     protected Texture icon;

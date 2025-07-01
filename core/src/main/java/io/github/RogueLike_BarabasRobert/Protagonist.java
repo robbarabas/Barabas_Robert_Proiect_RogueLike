@@ -22,12 +22,14 @@ public class Protagonist {
     List<Projectile> projectiles;
     List<Weapon> inventory = new ArrayList<>();
     int currentWeaponIndex = 0;
+    float wobbleTime = 0f; //
 
 
 
     float timeSinceLastShot = 0;
     public float speed=5.5f;
     public int health ;
+    public int max_health;
     public float power=1;
     public int projectile_multiplier=2;
     private GameUI gameUI;
@@ -50,11 +52,13 @@ public class Protagonist {
     }
 
     public Rectangle getBounds() {
-        return sprite.getBoundingRectangle();
+        Rectangle bounds=sprite.getBoundingRectangle();
+            bounds.setSize(0.7f);
+        return bounds;
     }
 
 
-    public Protagonist(int health,GameUI ui) {
+    public Protagonist(int health,int max_health,float power,int projectile_multiplier,GameUI ui) {
         Texture_Tony = new Texture("Apple_body.png");
 
         Tony_face=new Texture("Apple_face_0.png");
@@ -66,6 +70,9 @@ public class Protagonist {
         sprite_face.setPosition(2, 2);
         gameUI=ui;
         this.health=health;
+        this.max_health=max_health;
+        this.power=power;
+        this.projectile_multiplier=projectile_multiplier;
         projectiles = new ArrayList<>();
         Weapon gun = new GunWeapon(new Texture("arrow.png"),this);
         Weapon shotgun = new ShotGunWeapon(new Texture("projectile_0.png"),this);
@@ -86,6 +93,8 @@ public class Protagonist {
         if (Gdx.input.isKeyPressed(Input.Keys.A)) moveX -= 1;
         if (Gdx.input.isKeyPressed(Input.Keys.D)) moveX += 1;
 
+        boolean isMoving = moveX != 0 || moveY != 0;
+
         float length = (float) Math.sqrt(moveX * moveX + moveY * moveY);
         if (length != 0) {
             moveX /= length;
@@ -94,8 +103,19 @@ public class Protagonist {
 
         float newX = sprite.getX() + moveX * speed * delta;
         float newY = sprite.getY() + moveY * speed * delta;
-        Rectangle futureBounds = new Rectangle(newX, newY, sprite.getWidth(), sprite.getHeight());
 
+        if (isMoving) {
+            wobbleTime += delta * 10f; // Faster wobble while walking
+            float scaleY = 1f + (float) Math.sin(wobbleTime) * 0.2f; // Wobble amplitude
+            float scaleX = 1f - (float) Math.sin(wobbleTime) * 0.05f;
+            sprite.setOriginCenter(); // Very important
+            sprite.setScale(scaleX, scaleY);
+        } else {
+            // Reset scale when idle
+            sprite.setScale(1f, 1f);
+        }
+
+        Rectangle futureBounds = new Rectangle(newX, newY, sprite.getWidth()*0.7f, sprite.getHeight()*0.7f);
         boolean collides = false;
         for (Wall wall : walls) {
             if (futureBounds.overlaps(wall.getBounds())) {
@@ -106,22 +126,22 @@ public class Protagonist {
 
         if (!collides) {
             sprite.setPosition(newX, newY);
-            sprite_face.setPosition(newX,newY);
+            sprite_face.setPosition(newX, newY);
         }
 
         timeSinceLastShot += delta;
-
 
         // Update projectiles
         Iterator<Projectile> iter = projectiles.iterator();
         while (iter.hasNext()) {
             Projectile p = iter.next();
             p.update(delta);
-            if (p.isOffScreen()) {
+            if (p.shouldRemove()) {
                 iter.remove();
             }
         }
-        // use weapon
+
+        // Use weapon
         Weapon current = inventory.get(currentWeaponIndex);
         current.update(delta);
 
@@ -129,19 +149,21 @@ public class Protagonist {
             current.use(this);
         }
 
-// Switch weapons with Q/E
+        // Switch weapons
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             currentWeaponIndex = (currentWeaponIndex - 1 + inventory.size()) % inventory.size();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             currentWeaponIndex = (currentWeaponIndex + 1) % inventory.size();
         }
+
         gameUI.setWeaponIcon(inventory.get(currentWeaponIndex).weaponIcon);
-        Weapon=new Sprite(inventory.get(currentWeaponIndex).weaponIcon);
-        Weapon.setSize(1f,1f);
+        Weapon = new Sprite(inventory.get(currentWeaponIndex).weaponIcon);
+        Weapon.setSize(1f, 1f);
+
         float mouseX = Gdx.input.getX();
         float mouseY = Gdx.input.getY();
-        rotate_around_cursor(Weapon,mouseX,mouseY);
+        rotate_around_cursor(Weapon, mouseX, mouseY);
     }
 
 

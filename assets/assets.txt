@@ -14,6 +14,10 @@ enemy_0_face.png
 enemy_1_body.png
 enemy_1_face.png
 projectile_0.png
+shop_heal.png
+shop_maxhp.png
+shop_mult.png
+shop_power.png
 shotgun.png
 ui/font-list.fnt
 ui/font-subtitle.fnt

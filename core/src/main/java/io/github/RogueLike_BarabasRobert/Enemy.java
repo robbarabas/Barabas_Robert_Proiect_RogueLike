@@ -16,8 +16,8 @@ public class Enemy {
 
     float damageCooldown = 1f;
     float timeSinceLastHit = 0f;
-    float health = 5;
-
+    float health = 4;
+    float wobbleTime = 0f;
     // Knockback and hit effect
     float knockbackX = 0;
     float knockbackY = 0;
@@ -117,6 +117,11 @@ public class Enemy {
                 }
             }
 
+            wobbleTime += delta * 10f; // Faster wobble while walking
+            float scaleY = 1f + (float) Math.sin(wobbleTime) * 0.1f; // Wobble amplitude
+            float scaleX = 1f - (float) Math.sin(wobbleTime) * 0.2f;
+            sprite.setOriginCenter(); // Very important
+            sprite.setScale(scaleX, scaleY);
             if (dist > 0.3) {
                 dx /= dist;
                 dy /= dist;

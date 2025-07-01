@@ -13,7 +13,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Main extends Game {
     public int totalCoins = 0;
     public int health = 10;
+    public int max_health=10;
+    public int power=1;
+    public int projectile_multiplier=2;
+    public int stage=1;
     public String currentSaveName;
+    public int enemiesKilled=0;
+    public int totalCoinsEarned=0;
 
 
     SpriteBatch spriteBatch;
@@ -76,7 +82,7 @@ public class Main extends Game {
         if (currentSaveName == null || currentSaveName.isEmpty()) return;
 
         FileHandle file = Gdx.files.local("saves/" + currentSaveName + ".save");
-        file.writeString(health + "," + totalCoins, false);
+        file.writeString(health + "," + totalCoins+ "," +max_health+","+power+ "," + projectile_multiplier+","+stage+","+totalCoins+","+enemiesKilled, false);
         System.out.println("Auto-saved to: " + currentSaveName);
     }
 

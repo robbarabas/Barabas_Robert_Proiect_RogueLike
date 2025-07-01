@@ -22,6 +22,10 @@ public class GameUI {
     private ProgressBar healthBar;
     private ProgressBar cooldownBar;
     private Image coinIcon, heartIcon, weaponIconImage;
+    Protagonist Protag;
+    private float max_health=10;
+
+    private Table panel; // Now a class field so we can modify it dynamically
 
     public GameUI() {
         stage = new Stage(new ScreenViewport());
@@ -38,22 +42,6 @@ public class GameUI {
         weaponNameLabel = new Label("Weapon: ???", skin);
         weaponNameLabel.setFontScale(1.5f);
 
-        // === HEALTH BAR ===
-        Drawable bg = skin.newDrawable("white", 0.1f, 0.1f, 0.1f, 1);
-        Drawable fg = skin.newDrawable("white", 1, 0, 0, 1);
-        bg.setMinHeight(40);
-        fg.setMinHeight(40);
-
-        ProgressBar.ProgressBarStyle healthStyle = new ProgressBar.ProgressBarStyle();
-        healthStyle.background = bg;
-        healthStyle.knobBefore = fg;
-        healthStyle.knob = new Image().getDrawable();
-
-        healthBar = new ProgressBar(0, 100, 1, false, healthStyle);
-        healthBar.setAnimateDuration(0.2f);
-        healthBar.setValue(100);
-        healthBar.setWidth(150);
-
         // === COOLDOWN BAR ===
         ProgressBar.ProgressBarStyle cdStyle = new ProgressBar.ProgressBarStyle();
         cdStyle.background = skin.newDrawable("white", 0.2f, 0.2f, 0.2f, 1);
@@ -69,11 +57,34 @@ public class GameUI {
         stage.addActor(cooldownBar);
 
         // === PANEL ===
-        Table panel = new Table();
+        panel = new Table();
         panel.setBackground(skin.newDrawable("white", 0, 0, 0, 0.5f));
         panel.pad(10).top().left();
         panel.setFillParent(false);
         panel.setPosition(10, stage.getViewport().getWorldHeight() - 10);
+        stage.addActor(panel);
+    }
+
+    private void rebuildHealthBar() {
+        max_health = Protag.max_health;
+
+        Drawable bg = skin.newDrawable("white", 0.1f, 0.1f, 0.1f, 1);
+        Drawable fg = skin.newDrawable("white", 1, 0, 0, 1);
+        bg.setMinHeight(40);
+        fg.setMinHeight(40);
+
+        ProgressBar.ProgressBarStyle healthStyle = new ProgressBar.ProgressBarStyle();
+        healthStyle.background = bg;
+        healthStyle.knobBefore = fg;
+        healthStyle.knob = new Image().getDrawable();
+
+        healthBar = new ProgressBar(0, max_health, 1, false, healthStyle);
+        healthBar.setAnimateDuration(0.2f);
+        healthBar.setValue(Protag.health);
+        healthBar.setWidth(150);
+
+        // Rebuild the panel with the updated healthBar
+        panel.clearChildren();
 
         panel.add(heartIcon).size(48, 48).padRight(5);
         panel.add(healthBar).width(150).padRight(20);
@@ -84,15 +95,15 @@ public class GameUI {
 
         panel.row().padTop(5);
         panel.add(weaponIconImage).size(80, 80).padRight(5);
-
-
-        stage.addActor(panel);
     }
 
     // === Public Methods ===
     public void update(int coins, int health) {
         coinLabel.setText(String.valueOf(coins));
-        healthBar.setValue(health);
+        if (healthBar != null) {
+            healthBar.setValue(health);
+        }
+
     }
 
     public void setCooldown(float percent) {
@@ -116,8 +127,13 @@ public class GameUI {
         }
     }
 
-    public void render() {
+    public void set_protag(Protagonist Protag) {
+        this.Protag = Protag;
+        rebuildHealthBar();
+       // Now builds the health bar after Protag is available
+    }
 
+    public void render() {
         stage.act();
         stage.draw();
     }

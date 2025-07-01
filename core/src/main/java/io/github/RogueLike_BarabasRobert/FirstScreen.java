@@ -25,6 +25,8 @@ public class FirstScreen implements Screen {
     List<Coin> coins;
     List<Wall> walls;
     List<Projectile> enemyProjectiles = new ArrayList<>();
+    private List<ShopItem> shopItems = new ArrayList<>();
+    Texture healIcon, powerIcon, healthUpIcon, multIcon; // Load these in `initializeGameObjects`
     List<Vector2> ocupied_tiles=new ArrayList<>();
     BitmapFont font;
     int coinCount=0;
@@ -38,22 +40,27 @@ public class FirstScreen implements Screen {
         initializeEnemies();
 
     }
-    private void saveGame(int health, int coins) {
-        FileHandle file = Gdx.files.local("save.txt");
-        file.writeString(health + "," + coins, false);
-    }
+
 
     private void initializeGameObjects() {
+         //protagonist
         ui = new GameUI();
+        Tony = new Protagonist(game.health,game.max_health,game.power,game.projectile_multiplier,ui);
+        ui.set_protag(Tony);
+        //UI
+
         GameUI.setCrosshairCursor("crosshair.png", 16, 16);
         Gdx.input.setInputProcessor(new InputMultiplexer(ui.getStage())); // For UI input
-        Tony = new Protagonist(game.health,ui);
+
         coinCount=game.totalCoins;
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(16, 10);
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-
+        healIcon = new Texture("shop_heal.png");
+        powerIcon = new Texture("shop_power.png");
+        healthUpIcon = new Texture("shop_maxhp.png");
+        multIcon = new Texture("shop_mult.png");
         backgroundTexture = new Texture("background_0.png");
         enemyTexture = new Texture("enemy_0_body.png");
         enemyFace = new Texture("enemy_0_face.png");
@@ -71,8 +78,27 @@ public class FirstScreen implements Screen {
     }
 
     private void initializeEnemies() {
-        spawnEnemies(3, 0); // melee enemies
-        spawnEnemies(2, 1);  // ranged enemies
+        if (game.stage % 4 == 0) {
+            initializeShop();
+        } else {
+            int meleeCount = 2+ game.stage;
+
+            int rangedCount = 1 + game.stage / 2;
+            spawnEnemies(meleeCount, 0); // melee
+            spawnEnemies(rangedCount, 1); // ranged
+        }
+    }
+
+
+    private void initializeShop() {
+        float[][] positions = {{8, 6}, {10, 6}, {8, 4}, {10, 4}};
+        Texture[] icons = {healIcon, powerIcon, healthUpIcon, multIcon};
+
+
+        for (int i = 0; i < 4; i++) {
+            ShopItem item = new ShopItem(positions[i][0], positions[i][1], icons[i], i);
+            shopItems.add(item);
+        }
     }
 
     private void spawnEnemies(int count, int Type) {
@@ -100,10 +126,11 @@ public class FirstScreen implements Screen {
 
             // Spawn the appropriate type of enemy
             switch (Type) {
-                case(0): enemies.add(new EnemyRanged(x + 6, y + 1, enemyTexture_ranged, enemyFace_ranged, Tony, enemy_proj_0, enemyProjectiles));
+                case(0): enemies.add(new Enemy(x + 6, y + 1, enemyTexture, enemyFace, Tony));
+                    break;
+                case(1): enemies.add(new EnemyRanged(x + 6, y + 1, enemyTexture_ranged, enemyFace_ranged, Tony, enemy_proj_0, enemyProjectiles));
                 break;
-                case(1): enemies.add(new Enemy(x + 6, y + 1, enemyTexture, enemyFace, Tony));
-                break;
+
             }
         }
     }
@@ -128,15 +155,16 @@ public class FirstScreen implements Screen {
 
             }
         }
-        // Random non-border walls
-        Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            float x = (int) (random.nextFloat() * 15f);
-            float y = (int) (random.nextFloat() * 9f);
-            if (x == 2 && y == 2) continue;
-            walls.add(new Wall(x, y, 1, 1));
-            ocupied_tiles.add(new Vector2(x,y));
-        }
+      if(game.stage%4!=0) {// Random non-border walls
+          Random random = new Random();
+          for (int i = 0; i < 8; i++) {
+              float x = (int) (random.nextFloat() * 15f);
+              float y = (int) (random.nextFloat() * 9f);
+              if (x == 2 && y == 2) continue;
+              walls.add(new Wall(x, y, 1, 1));
+              ocupied_tiles.add(new Vector2(x, y));
+          }
+      }
 
     }
 
@@ -160,6 +188,7 @@ public class FirstScreen implements Screen {
             game.totalCoins = coinCount;
             game.health = Tony.health;
             game.autoSave();
+            game.stage++;
             game.setScreen(new FirstScreen(game));
         }
 
@@ -168,6 +197,9 @@ public class FirstScreen implements Screen {
     }
 
     private void updateProjectiles(float delta) {
+        if (Tony.health <= 0) {
+            game.setScreen(new Deathscreen(game, game.stage, game.totalCoinsEarned, game.enemiesKilled));
+        }
         Iterator<Projectile> projIter = Tony.getProjectiles().iterator();
         while (projIter.hasNext()) {
             Projectile p = projIter.next();
@@ -175,13 +207,17 @@ public class FirstScreen implements Screen {
 
             for (Enemy enemy : enemies) {
                 if (p.getBounds().overlaps(enemy.getBounds())) {
-                    enemy.takeDamage(Tony.power);
+                    enemy.takeDamage(Tony.power*Tony.getCurrentWeapon().base_power);
                     remove = true;
-                    if (enemy.health < 0) {
+                    if (enemy.health <= 0) {
                         enemies.remove(enemy);
+                        game.enemiesKilled++;
+                        //chanse for coin
                         if (random() < 0.33f) {
-                            coins.add(new Coin(enemy.sprite.getX(), enemy.sprite.getY(), coinTexture));
+                            coins.add(new Coin(enemy.sprite.getX(), enemy.sprite.getY(), coinTexture,1));
                         }
+
+
                     }
                     break;
                 }
@@ -206,6 +242,7 @@ public class FirstScreen implements Screen {
             if (p.getBounds().overlaps(Tony.getBounds())) {
                 Tony.health -= 1;
                 enemyIter.remove();
+
                 continue;
             }
 
@@ -227,11 +264,45 @@ public class FirstScreen implements Screen {
         coins.removeIf(coin -> {
             if (coin.getBounds().overlaps(Tony.getBounds())) {
                 coinCount++;
+                game.totalCoinsEarned++;
                 return true;
             }
             return false;
         });
+        //shop items
+        Iterator<ShopItem> iter = shopItems.iterator();
+        while (iter.hasNext()) {
+            ShopItem item = iter.next();
+            if (item.getBounds().overlaps(Tony.getBounds()) && coinCount >= item.getCost()) {
+                coinCount -= item.getCost();
+                applyShopEffect(item.getType());
+                iter.remove();
+            }
+        }
     }
+    private void applyShopEffect(int type) {
+        switch (type) {
+            case 0: // Heal
+                Tony.health = Math.min(Tony.health + 10, Tony.max_health);
+                game.health=Math.min(Tony.health + 10, Tony.max_health);
+                break;
+            case 1: // Power
+                Tony.power += 1;
+                game.power+=1;
+                break;
+            case 2: // Max health
+                Tony.max_health += 5;
+                Tony.health+=5;
+                game.health+=5;
+                game.max_health+=5;
+                break;
+            case 3: // Multiplier
+                Tony.projectile_multiplier += 1;
+                game.projectile_multiplier+=1;
+                break;
+        }
+    }
+
 
     private void updateEnemies(float delta) {
         for (Enemy e : enemies) {
@@ -259,6 +330,9 @@ public class FirstScreen implements Screen {
         for (Coin coin : coins)
             coin.render(spriteBatch);
 
+        for (ShopItem item : shopItems)
+            item.render(spriteBatch);
+
         for (Projectile p : enemyProjectiles)
             p.render(spriteBatch);
 
@@ -272,7 +346,7 @@ public class FirstScreen implements Screen {
         ui.setWeaponName(currentWeapon.getName());
         ui.setCooldown(currentWeapon.getCooldownPercent());
         ui.setCooldownBarPosition(new Vector2(Tony.getX() + 0.5f, Tony.getY() + 1.5f), viewport);
-        ui.update(coinCount, Tony.health);
+        ui.update(coinCount,Tony.health);
         ui.render();
     }
 
@@ -292,4 +366,5 @@ public class FirstScreen implements Screen {
         wallTexture.dispose();
         backgroundTexture.dispose();
     }
+
 }

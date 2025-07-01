@@ -12,7 +12,9 @@ public class ShotGunWeapon extends Weapon {
     Vector2 tip;
 
     public ShotGunWeapon(Texture projectileTexture, Protagonist owner) {
-        super("Shotgun", 0.3f); // Cooldown time between shots
+
+        super("Shotgun", 2f); // Cooldown time between shots
+        super.base_power=1;
         this.owner = owner;
         this.projectileTexture = projectileTexture;
         this.weaponIcon=new Texture("shotgun.png");
@@ -32,8 +34,8 @@ public class ShotGunWeapon extends Weapon {
         float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
         float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
 
-        float startX = owner.getX() + 0.5f;
-        float startY = owner.getY() + 0.5f;
+        float startX = owner.getX()+0.3f ;
+        float startY = owner.getY()+0.3f ;
 
         float dirX = worldMouseX - startX;
         float dirY = worldMouseY - startY;
@@ -46,9 +48,9 @@ public class ShotGunWeapon extends Weapon {
 
             float dx = (float) Math.cos(angle);
             float dy = (float) Math.sin(angle);
-             tip = owner.getWeaponTipPosition();
 
-            owner.getProjectiles().add(new Projectile(tip.x, tip.y, dx, dy, projectileTexture));
+
+            owner.getProjectiles().add(new Projectile(startX, startY, dx, dy, projectileTexture,7f));
         }
     }
 }

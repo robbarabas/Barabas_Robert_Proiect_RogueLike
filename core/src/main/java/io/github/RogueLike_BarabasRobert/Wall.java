@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Wall {
-    private static final float BOUNDING_BOX_SCALE = 0.7f; // 80% of size
+    private static final float BOUNDING_BOX_SCALE = 0.6f; // 60% of size
     Rectangle bounds;
     float x, y, width, height;
     boolean breakable;

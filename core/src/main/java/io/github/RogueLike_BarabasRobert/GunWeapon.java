@@ -15,7 +15,7 @@ public class GunWeapon extends Weapon {
     public GunWeapon(Texture projectileTexture, Protagonist owner) {
 
 
-        super("Burst Gun", 0.5f); // Total cooldown before next burst
+        super("Burst Gun", 0.6f); // Total cooldown before next burst
         Owner = owner;
         burstCount=owner.projectile_multiplier;
         this.projectileTexture = projectileTexture;
@@ -59,8 +59,8 @@ public class GunWeapon extends Weapon {
         float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
         float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
 
-        float startX = owner.getX() + 0.5f;
-        float startY = owner.getY() + 0.5f;
+        float startX = owner.getX() ;
+        float startY = owner.getY() ;
 
         float dirX = worldMouseX - startX;
         float dirY = worldMouseY - startY;
@@ -68,6 +68,6 @@ public class GunWeapon extends Weapon {
         dirX /= len;
         dirY /= len;
 
-        owner.getProjectiles().add(new Projectile(startX, startY, dirX, dirY, projectileTexture,1,1));
+        owner.getProjectiles().add(new Projectile(startX, startY, dirX, dirY, projectileTexture,7,0.9f,0.9f));
     }
 }

@@ -17,6 +17,7 @@ public class EnemyRanged extends Enemy {
         super(x, y, texture, faceTexture, target);
         this.projectileTexture = projectileTexture;
         this.enemyProjectiles = enemyProjectiles;
+        this.health=6;
         setSpeed(1);
     }
 
@@ -35,7 +36,7 @@ public class EnemyRanged extends Enemy {
             dx /= dist;
             dy /= dist;
 
-            enemyProjectiles.add(new Projectile(getX(), getY(), dx, dy, projectileTexture));
+            enemyProjectiles.add(new Projectile(getX(), getY(), dx, dy, projectileTexture,5f));
             timeSinceLastShot = 0f;
         }
     }

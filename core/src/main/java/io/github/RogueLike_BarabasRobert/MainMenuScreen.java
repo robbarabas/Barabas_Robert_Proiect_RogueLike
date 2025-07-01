@@ -41,7 +41,16 @@ public class MainMenuScreen extends ScreenAdapter {
         // === Start Game Button ===
         TextButton startButton = new TextButton("Start Game (No Load)", skin);
         startButton.addListener(new ClickListener() {
+
             public void clicked(InputEvent event, float x, float y) {
+                game.totalCoins = 0;
+                game.health = 10;
+                game.max_health=10;
+                game.power=1;
+                game.projectile_multiplier=2;
+                game.stage=1;
+                game.enemiesKilled=0;
+                game.totalCoinsEarned=0;
                 game.currentSaveName = "autosave"; // default autosave name
                 game.autoSave(); // save initial state
                 game.setScreen(new FirstScreen(game));
@@ -55,7 +64,14 @@ public class MainMenuScreen extends ScreenAdapter {
                 String name = saveNameInput.getText().trim();
                 if (!name.isEmpty()) {
                     FileHandle file = savesDir.child(name + ".save");
-                    file.writeString(game.health + "," + game.totalCoins, false);
+                    file.writeString(game.health + "," +
+                        game.totalCoins + "," +
+                        game.max_health + "," +
+                        game.power + "," +
+                        game.projectile_multiplier + "," +
+                        game.stage + "," +
+                        game.totalCoinsEarned + "," +
+                        game.enemiesKilled, false);
                     saveSelect.setItems(getSaveNames());
                     System.out.println("Saved game as: " + name);
                     game.currentSaveName=name;
@@ -73,6 +89,12 @@ public class MainMenuScreen extends ScreenAdapter {
                     if (values != null) {
                         game.health = values[0];
                         game.totalCoins = values[1];
+                        game.max_health=values[2];
+                        game.power=values[3];
+                        game.projectile_multiplier=values[4];
+                        game.stage=values[5];
+                        game.totalCoinsEarned=values[6];
+                      game.enemiesKilled=values[7];
                         game.currentSaveName = selected; // set active save
                         game.autoSave(); // optional initial save
                         game.setScreen(new FirstScreen(game));
@@ -83,6 +105,7 @@ public class MainMenuScreen extends ScreenAdapter {
                 }
             }
         });
+
 
         // === Delete Save Button ===
         TextButton deleteSaveButton = new TextButton("Delete Save", skin);
@@ -146,9 +169,14 @@ public class MainMenuScreen extends ScreenAdapter {
             if (!file.exists()) return null;
 
             String[] parts = file.readString().trim().split(",");
-            int health = Integer.parseInt(parts[0]);
-            int coins = Integer.parseInt(parts[1]);
-            return new int[]{health, coins};
+
+            int []values=new int[8];
+            for(int i=0;i<=7;i++)
+            {
+               values[i] =Integer.parseInt(parts[i]);
+            }
+
+            return values;
         } catch (Exception e) {
             System.err.println("Failed to load save: " + e.getMessage());
             return null;
