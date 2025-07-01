@@ -75,7 +75,7 @@ Important data is stored in the `saves` folder and contains information such as:
   - **WASD** - Movement
   - **Left Click** - Shoot
   - **Q/E** - Switch weapons
-```
+
 
 
 ## Conclusion
