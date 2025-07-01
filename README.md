@@ -1,6 +1,6 @@
-# An Aplle a Day keeps the enemies at bay
-# A.D.K.E.B: A 2D Dungeon roguelite game
 
+# A.D.K.E.B: A 2D Dungeon roguelite game
+-** An aplle a day keeps the enemies at bay**
 ### Developed by Barabas Robert Ilie| Java + LibGDX | 2025
 
 ---
@@ -33,14 +33,13 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
 
 - **Language**: Java  
 - **Framework**: [LibGDX](https://libgdx.com/)  
-- **Concept**: A top-down 2D game where enemies track the player, interact with the environment, and respond to being hit.  
+- **Concept**: A top-down 2D game where the protagonist interacts with a more and more dangerous eviroment helped by weapons and upgrades.  
 - **Tools Used**:  
   - IntelliJ IDEA (development)  
   - Krita (drawing sprites)
 ---
-
-
-###  Logic Structure
+### Aplication Prezentation
+## Logic Structure
 
 ```
 MainGame
@@ -56,6 +55,34 @@ MainGame
      ├── Pick-ups (coins/shopitems)
      └── Walls
 ```
+## Data Mangement
+```
+Important data is stored in the folder saves and contains information such as :
+-stage number
+-health
+-coins
+-etc...
+```
+## How to use ?
+```
+-Run the Rogue.jar
+-Start the game or make a save or load a previous save 
+-**KEYS**
+-**ASDW** movement
+-**LeftClick** shoot
+-**Q E** swich weapons
+
+```
+
+##Conclusion
+This project successfully demonstrates the implementation of a 2D roguelike dungeon game using Java and LibGDX, combining practical programming skills with game design concepts such as AI, collision detection, and user interaction. The modular architecture ensures scalability and maintainability, allowing future enhancements like new enemy types, weapons, or game mechanics. Overall, the project met its goals of creating an engaging and functional game while serving as an effective learning experience in game development.
+
+##Bibliography
+LibGDX Official Documentation – https://libgdx.com/wiki/
+
+Krita Manual – https://docs.krita.org/en/
+
+Stack Overflow community for troubleshooting and development tips
 
 ## Platforms
 
