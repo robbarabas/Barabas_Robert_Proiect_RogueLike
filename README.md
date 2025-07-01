@@ -75,15 +75,17 @@ Important data is stored in the folder saves and contains information such as :
 ```
 
 ##Conclusion
+```
 This project successfully demonstrates the implementation of a 2D roguelike dungeon game using Java and LibGDX, combining practical programming skills with game design concepts such as AI, collision detection, and user interaction. The modular architecture ensures scalability and maintainability, allowing future enhancements like new enemy types, weapons, or game mechanics. Overall, the project met its goals of creating an engaging and functional game while serving as an effective learning experience in game development.
-
+``
 ##Bibliography
+```
 LibGDX Official Documentation – https://libgdx.com/wiki/
 
 Krita Manual – https://docs.krita.org/en/
 
 Stack Overflow community for troubleshooting and development tips
-
+```
 ## Platforms
 
 - `core`: Main module with the application logic shared by all platforms.
