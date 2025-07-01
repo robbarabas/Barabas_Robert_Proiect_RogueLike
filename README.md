@@ -40,21 +40,20 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
 ---
 
 
-### 🧩 Architecture & Structure
+###  Architecture & Structure
 
-**MainGame**:->*MainMenuScreen*:
-			->Game UI;
-	     ->*FirstScreen*:
-			->Game UI;
-			->Protagonist:  
-				->weapons;
-				->projectiles;
-							
-			->Enemies;
-				->projectiles;
-			->Pick-ups (coins/shopitems)
-			->Walls
-			
+MainGame
+├── MainMenuScreen
+│    └── Game UI
+└── FirstScreen
+     ├── Game UI
+     ├── Protagonist
+     │     ├── weapons
+     │     └── projectiles
+     ├── Enemies
+     │     └── projectiles
+     ├── Pick-ups (coins/shopitems)
+     └── Walls
 
 ## Platforms
 
