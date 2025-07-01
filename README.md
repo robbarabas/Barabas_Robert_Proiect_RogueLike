@@ -1,5 +1,5 @@
 
-# A.D.K.E.B: A 2D Dungeon Roguelite Game
+# A.D.K.E.B: A 2D Dungeon Roguelite Game  
 *An apple a day keeps the enemies at bay*  
 **Developed by Barabas Robert Ilie | Java + LibGDX | 2025**
 
@@ -41,7 +41,7 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
 ---
 
 ## Application Presentation
----
+
 ### Logic Structure
 
 ```
@@ -58,7 +58,7 @@ MainGame
      ├── Pick-ups (coins/shop items)
      └── Walls
 ```
----
+
 ### Data Management
 
 Important data is stored in the `saves` folder and contains information such as:  
@@ -66,7 +66,7 @@ Important data is stored in the `saves` folder and contains information such as:
 - Health  
 - Coins  
 - Etc.
----
+
 ### How to Use
 
 ```bash
@@ -79,16 +79,15 @@ Important data is stored in the `saves` folder and contains information such as:
 ```
 
 ---
----
+
 ## Conclusion
-```
+
 This project successfully demonstrates the implementation of a 2D roguelike dungeon game using Java and LibGDX, combining practical programming skills with game design concepts such as AI, collision detection, and user interaction. The modular architecture ensures scalability and maintainability, allowing future enhancements like new enemy types, weapons, or game mechanics. Overall, the project met its goals of creating an engaging and functional game while serving as an effective learning experience in game development.
 
 ---
-```
----
+
 ## Bibliography
-```
+
 - [LibGDX Official Documentation](https://libgdx.com/wiki/)  
 - [Krita Manual](https://docs.krita.org/en/)  
 - Stack Overflow community for troubleshooting and development tips  
@@ -96,15 +95,14 @@ This project successfully demonstrates the implementation of a 2D roguelike dung
 - Oracle Java Tutorials — https://docs.oracle.com/javase/tutorial/
 
 ---
-```
----
+
 ## Platforms
 
 - **core:** Main module with the application logic shared by all platforms.  
 - **lwjgl3:** Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
 
 ---
----
+
 ## Gradle
 
 This project uses [Gradle](https://gradle.org/) to manage dependencies. The Gradle wrapper is included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew`.
