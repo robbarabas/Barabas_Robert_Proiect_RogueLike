@@ -41,7 +41,7 @@ The challenge was to simulate a dungeon where enemies pursue the player, navigat
 
 
 ###  Architecture & Structure
-
+```
 MainGame
 ├── MainMenuScreen
 │    └── Game UI
@@ -54,7 +54,7 @@ MainGame
      │     └── projectiles
      ├── Pick-ups (coins/shopitems)
      └── Walls
-
+```
 ## Platforms
 
 - `core`: Main module with the application logic shared by all platforms.
