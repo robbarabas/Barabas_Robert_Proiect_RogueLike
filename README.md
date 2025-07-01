@@ -89,8 +89,7 @@ This project successfully demonstrates the implementation of a 2D roguelike dung
 - [LibGDX Official Documentation](https://libgdx.com/wiki/)  
 - [Krita Manual](https://docs.krita.org/en/)  
 - Stack Overflow community for troubleshooting and development tips  
-- "Game Programming Patterns" by Robert Nystrom — https://gameprogrammingpatterns.com/  
-- Oracle Java Tutorials — https://docs.oracle.com/javase/tutorial/
+
 
 ---
 
