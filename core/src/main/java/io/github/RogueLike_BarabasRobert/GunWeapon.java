@@ -1,7 +1,9 @@
 package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Represents a gun-type weapon that fires projectiles in bursts.
@@ -33,6 +35,7 @@ public class GunWeapon extends Weapon {
     /** Flag indicating whether the weapon is currently firing a burst. */
     boolean isBursting = false;
 
+
     /**
      * Constructs a new GunWeapon with a specified projectile texture and owner.
      * Initializes the weapon with a burst cooldown time.
@@ -40,8 +43,8 @@ public class GunWeapon extends Weapon {
      * @param projectileTexture The texture used for projectiles fired by this weapon.
      * @param owner The protagonist who owns this weapon.
      */
-    public GunWeapon(Texture projectileTexture, Protagonist owner) {
-        super("Burst Gun", 0.6f); // Sets weapon name and total cooldown
+    public GunWeapon(Texture projectileTexture, Protagonist owner, Camera viewport) {
+        super("Burst Gun", 0.6f, viewport); // Sets weapon name and total cooldown
         Owner = owner;
         burstCount = owner.projectile_multiplier;
         this.projectileTexture = projectileTexture;
@@ -100,20 +103,20 @@ public class GunWeapon extends Weapon {
         float mouseY = Gdx.input.getY();
 
         // Convert screen coordinates to world coordinates (assuming fixed world size)
-        float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
-        float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
+        Vector3 screenCoords = new Vector3(mouseX, mouseY, 0);
+        Vector3 worldCoords = super.viewport.unproject(screenCoords);
 
-        float startX = owner.getX();
-        float startY = owner.getY();
+        float worldMouseX = worldCoords.x;
+        float worldMouseY = worldCoords.y;
 
         // Calculate normalized direction vector from owner to mouse cursor
-        float dirX = worldMouseX - startX;
-        float dirY = worldMouseY - startY;
+        float dirX = worldMouseX - owner.getX();
+        float dirY = worldMouseY -  owner.getY();
         float len = (float) Math.sqrt(dirX * dirX + dirY * dirY);
         dirX /= len;
         dirY /= len;
 
         // Create and add new projectile to the owner's projectile list
-        owner.getProjectiles().add(new Projectile(startX, startY, dirX, dirY, projectileTexture, 7, 0.9f, 0.9f));
+        owner.getProjectiles().add(new Projectile(owner.getX(), owner.getY(), dirX, dirY, projectileTexture, 7, owner.WorldHeight,owner.WorldHeight));
     }
 }

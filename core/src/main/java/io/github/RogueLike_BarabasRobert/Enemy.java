@@ -35,7 +35,8 @@ public class Enemy {
 
     /** Timer for wobble animation effect while moving. */
     float wobbleTime = 0f;
-
+    float worldHeight;
+    float worldWidth;
     /** Knockback velocity components on X and Y axes. */
     float knockbackX = 0;
     float knockbackY = 0;
@@ -62,7 +63,7 @@ public class Enemy {
      * @param face_texture Texture for the enemy's face sprite.
      * @param target The protagonist that this enemy will pursue.
      */
-    public Enemy(float x, float y, Texture texture, Texture face_texture, Protagonist target) {
+    public Enemy(float x, float y, Texture texture, Texture face_texture, Protagonist target,float worldHeight,float worldWidth) {
         this.target = target;
 
         sprite = new Sprite(texture);

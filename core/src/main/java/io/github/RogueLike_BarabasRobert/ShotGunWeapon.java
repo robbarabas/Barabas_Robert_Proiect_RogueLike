@@ -1,8 +1,10 @@
 package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Represents a shotgun-style weapon that fires multiple projectiles in a spread.
@@ -29,8 +31,8 @@ public class ShotGunWeapon extends Weapon {
      * @param projectileTexture Texture for the pellets/projectiles.
      * @param owner The protagonist who owns this weapon.
      */
-    public ShotGunWeapon(Texture projectileTexture, Protagonist owner) {
-        super("Shotgun", 2f); // 2 seconds cooldown between shots
+    public ShotGunWeapon(Texture projectileTexture, Protagonist owner, Camera viewport) {
+        super("Shotgun", 2f,viewport); // 2 seconds cooldown between shots
         super.base_power = 1;
         this.owner = owner;
         this.projectileTexture = projectileTexture;
@@ -59,16 +61,17 @@ public class ShotGunWeapon extends Weapon {
         float mouseX = Gdx.input.getX();
         float mouseY = Gdx.input.getY();
 
-        // Convert screen coordinates to world coordinates
-        float worldMouseX = mouseX * (16f / Gdx.graphics.getWidth());
-        float worldMouseY = (Gdx.graphics.getHeight() - mouseY) * (10f / Gdx.graphics.getHeight());
 
         // Starting position of the projectile (near the protagonist)
-        float startX = owner.getX() + 0.3f;
-        float startY = owner.getY() + 0.3f;
+        float startX = owner.getX() ;
+        float startY = owner.getY() ;
+        // mouse cords
+        Vector3 screenCoords = new Vector3(mouseX, mouseY, 0);
+        Vector3 worldCoords = super.viewport.unproject(screenCoords);
 
-        float dirX = worldMouseX - startX;
-        float dirY = worldMouseY - startY;
+
+        float dirX = worldCoords.x- startX;
+        float dirY = worldCoords.y- startY;
         float baseAngle = (float) Math.atan2(dirY, dirX);
 
         int totalProjectiles = pelletsPerShot * owner.projectile_multiplier;
@@ -81,7 +84,7 @@ public class ShotGunWeapon extends Weapon {
             float dx = (float) Math.cos(angle);
             float dy = (float) Math.sin(angle);
 
-            owner.getProjectiles().add(new Projectile(startX, startY, dx, dy, projectileTexture, 7f));
+            owner.getProjectiles().add(new Projectile(startX, startY, dx, dy, projectileTexture, 7f,owner.WorldHeight,owner.WorldWidth));
         }
     }
 }

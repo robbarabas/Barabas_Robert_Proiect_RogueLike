@@ -73,6 +73,7 @@ public class FirstScreen implements Screen {
 
     /** Flag indicating whether breakable walls have been removed. */
     boolean wallsBroken = false;
+    public float WorldWidth=20,WorldHeight=20;
 
     /**
      * Creates a new gameplay screen with the given game instance.
@@ -91,7 +92,8 @@ public class FirstScreen implements Screen {
      */
     private void initializeGameObjects() {
         ui = new GameUI();
-        Tony = new Protagonist(game.health, game.max_health, game.power, game.projectile_multiplier, ui);
+        viewport = new FitViewport(16,9);
+        Tony = new Protagonist(game.health, game.max_health, game.power, game.projectile_multiplier, ui, viewport.getCamera(),WorldHeight,WorldWidth);
         ui.set_protag(Tony);
 
         GameUI.setCrosshairCursor("crosshair.png", 16, 16);
@@ -99,7 +101,7 @@ public class FirstScreen implements Screen {
 
         coinCount = game.totalCoins;
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(16, 10);
+
         font = new BitmapFont();
         font.setColor(Color.WHITE);
 
@@ -182,10 +184,10 @@ public class FirstScreen implements Screen {
             // Instantiate appropriate enemy type
             switch (Type) {
                 case 0:
-                    enemies.add(new Enemy(x + 6, y + 1, enemyTexture, enemyFace, Tony));
+                    enemies.add(new Enemy(x + 6, y + 1, enemyTexture, enemyFace, Tony,WorldHeight,WorldWidth));
                     break;
                 case 1:
-                    enemies.add(new EnemyRanged(x + 6, y + 1, enemyTexture_ranged, enemyFace_ranged, Tony, enemy_proj_0, enemyProjectiles));
+                    enemies.add(new EnemyRanged(x + 6, y + 1, enemyTexture_ranged, enemyFace_ranged, Tony, enemy_proj_0, enemyProjectiles,WorldHeight,WorldWidth));
                     break;
             }
         }
@@ -196,20 +198,19 @@ public class FirstScreen implements Screen {
      * Also marks some walls as breakable exits on the right side.
      */
     private void generateBorderWalls() {
-        int worldWidth = 16;
-        int worldHeight = 10;
 
-        for (int x = 0; x < worldWidth; x++) {
+
+        for (int x = 0; x < WorldWidth; x++) {
             walls.add(new Wall(x, 0, 1, 1)); // bottom
-            walls.add(new Wall(x, worldHeight - 1, 1, 1)); // top
+            walls.add(new Wall(x, WorldHeight - 1, 1, 1)); // top
         }
 
-        for (int y = 1; y < worldHeight - 1; y++) {
+        for (int y = 1; y < WorldHeight - 1; y++) {
             walls.add(new Wall(0, y, 1, 1)); // left
             if (y > 3 && y < 7) {
-                walls.add(new Wall(worldWidth - 1, y, 1, 1, true)); // breakable exit
+                walls.add(new Wall(WorldWidth - 1, y, 1, 1, true)); // breakable exit
             } else {
-                walls.add(new Wall(worldWidth - 1, y, 1, 1, false));
+                walls.add(new Wall(WorldWidth - 1, y, 1, 1, false));
             }
         }
 
@@ -239,6 +240,10 @@ public class FirstScreen implements Screen {
         updateProjectiles(delta);
         handleCollisions();
         updateEnemies(delta);
+        // camera
+        viewport.getCamera().position.set(Tony.getX(), Tony.getY(), 0);
+        viewport.getCamera().update();
+       //dont render if (camera.frustum.boundsInFrustum(x, y, 0, width / 2, height / 2, 0))
 
         // Remove breakable walls when all enemies are defeated
         if (enemies.isEmpty() && !wallsBroken) {
@@ -320,9 +325,7 @@ public class FirstScreen implements Screen {
                 }
             }
 
-            if (p.shouldRemove()) {
-                enemyIter.remove();
-            }
+            
         }
     }
 
@@ -396,13 +399,12 @@ public class FirstScreen implements Screen {
      * Draws all game world objects including background, player, enemies, coins, walls, projectiles, and shop items.
      */
     private void drawWorld() {
-        float worldWidth = viewport.getWorldWidth();
-        float worldHeight = viewport.getWorldHeight();
+
 
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-        spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight);
+        spriteBatch.draw(backgroundTexture, 0, 0, WorldWidth, WorldHeight);
         Tony.render(spriteBatch);
 
         for (Wall wall : walls)

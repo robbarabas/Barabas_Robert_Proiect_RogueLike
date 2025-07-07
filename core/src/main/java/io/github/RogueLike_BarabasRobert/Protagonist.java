@@ -2,6 +2,7 @@ package io.github.RogueLike_BarabasRobert;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,6 +20,7 @@ import java.util.List;
  * and interaction with the game world such as collision detection.
  */
 public class Protagonist {
+    private final Camera viewport;
     /** Texture for the protagonist's body sprite */
     Texture Texture_Tony;
 
@@ -66,6 +68,8 @@ public class Protagonist {
 
     /** Number of projectiles fired per shot */
     public int projectile_multiplier = 2;
+
+    public float WorldHeight,WorldWidth;
 
     /** Reference to the UI to update weapon icon */
     private GameUI gameUI;
@@ -125,12 +129,14 @@ public class Protagonist {
      * @param projectile_multiplier Number of projectiles fired per shot.
      * @param ui Reference to the GameUI for updating weapon icon.
      */
-    public Protagonist(int health, int max_health, float power, int projectile_multiplier, GameUI ui) {
+    public Protagonist(int health, int max_health, float power, int projectile_multiplier, GameUI ui, Camera viewport,float WorldHeight,float WorldWidth) {
         Texture_Tony = new Texture("Apple_body.png");
         Tony_face = new Texture("Apple_face_0.png");
         sprite = new Sprite(Texture_Tony);
         sprite.setSize(1, 1);
         sprite.setPosition(2, 2);
+        this.WorldHeight=WorldHeight;
+        this.WorldWidth=WorldWidth;
 
         sprite_face = new Sprite(Tony_face);
         sprite_face.setSize(1, 1);
@@ -141,12 +147,13 @@ public class Protagonist {
         this.max_health = max_health;
         this.power = power;
         this.projectile_multiplier = projectile_multiplier;
+        this.viewport=viewport;
 
         projectiles = new ArrayList<>();
 
         // Initialize weapons and add to inventory
-        Weapon gun = new GunWeapon(new Texture("arrow.png"), this);
-        Weapon shotgun = new ShotGunWeapon(new Texture("projectile_0.png"), this);
+        Weapon gun = new GunWeapon(new Texture("arrow.png"), this,viewport);
+        Weapon shotgun = new ShotGunWeapon(new Texture("projectile_0.png"), this,viewport);
         Weapon = new Sprite(gun.getWeaponIcon());
         inventory.add(gun);
         inventory.add(shotgun);

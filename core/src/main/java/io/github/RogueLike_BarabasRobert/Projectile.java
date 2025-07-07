@@ -35,7 +35,8 @@ public class Projectile {
 
     /** Sprite representing the projectile with position, rotation, and size. */
     Sprite sprite;
-
+    private float width;
+    private float height;
     /**
      * Creates a new projectile with a given position, direction, texture, and speed.
      * The direction vector is normalized internally.
@@ -47,7 +48,7 @@ public class Projectile {
      * @param texture  Texture used to draw the projectile.
      * @param speed    Movement speed in units per second.
      */
-    public Projectile(float x, float y, float dirX, float dirY, Texture texture, float speed) {
+    public Projectile(float x, float y, float dirX, float dirY, Texture texture, float speed,float WorldHeight ,float WorldWidth ) {
         this.x = x;
         this.y = y;
         float length = (float)Math.sqrt(dirX * dirX + dirY * dirY);
@@ -57,7 +58,8 @@ public class Projectile {
         this.sprite = new Sprite(texture);
         this.sprite.setSize(0.5f, 0.5f);  // Default size
         this.speed = speed;
-
+        this.width=WorldWidth;
+        this.height=WorldHeight;
         // Calculate rotation angle based on direction vector
         float angle = (float) Math.toDegrees(Math.atan2(dirY, dirX));
         sprite.setRotation(angle);
@@ -77,8 +79,8 @@ public class Projectile {
      * @param size_x   Width of the projectile sprite.
      * @param size_y   Height of the projectile sprite.
      */
-    public Projectile(float x, float y, float dirX, float dirY, Texture texture, float speed, float size_x, float size_y) {
-        this(x, y, dirX, dirY, texture, speed);
+    public Projectile(float x, float y, float dirX, float dirY, Texture texture, float speed,float WorldHeight ,float WorldWidth , float size_x, float size_y) {
+        this(x, y, dirX, dirY, texture, speed,WorldHeight,WorldWidth);
         this.sprite.setSize(size_x, size_y);
     }
 
@@ -121,8 +123,8 @@ public class Projectile {
      *
      * @return true if the projectile is off-screen, false otherwise.
      */
-    public boolean isOffScreen() {
-        return x < -1 || y < -1 || x > 17 || y > 11;
+    public boolean isOffScreen(float width,float height) {
+        return x < -1 || y < -1 || x > width+1 || y > height+1;
     }
 
     /**
@@ -132,7 +134,7 @@ public class Projectile {
      * @return true if the projectile should be removed, false otherwise.
      */
     public boolean shouldRemove() {
-        return isOffScreen() || hasHit || lifeTime > maxLifeTime;
+        return isOffScreen(width,height) || hasHit || lifeTime > maxLifeTime;
     }
 
     /**

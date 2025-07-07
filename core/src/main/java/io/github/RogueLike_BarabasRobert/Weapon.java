@@ -1,5 +1,6 @@
 package io.github.RogueLike_BarabasRobert;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
@@ -23,16 +24,17 @@ public abstract class Weapon {
 
     /** The weapon's name */
     protected String name;
-
+    public Camera viewport;
     /**
      * Constructs a weapon with the specified name and cooldown.
      *
      * @param name Weapon's name
      * @param cooldown Cooldown duration in seconds
      */
-    public Weapon(String name, float cooldown) {
+    public Weapon(String name, float cooldown,Camera viewport) {
         this.name = name;
         this.cooldown = cooldown;
+        this.viewport=viewport;
     }
 
     /**
@@ -42,11 +44,12 @@ public abstract class Weapon {
      * @param cooldown Cooldown duration in seconds
      * @param weaponIcon Texture representing the weapon's icon
      */
-    public Weapon(String name, float cooldown, Texture weaponIcon) {
+    public Weapon(String name, float cooldown, Texture weaponIcon,Camera viewport) {
         this.name = name;
         this.cooldown = cooldown;
         this.weaponIcon = weaponIcon;
         this.timeSinceLastUse = cooldown; // Ready to use immediately
+        this.viewport=viewport;
     }
 
     /**

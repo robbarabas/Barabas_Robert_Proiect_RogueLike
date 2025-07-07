@@ -34,8 +34,8 @@ public class EnemyRanged extends Enemy {
      * @param enemyProjectiles Reference to the list managing active enemy projectiles.
      */
     public EnemyRanged(float x, float y, Texture texture, Texture faceTexture, Protagonist target,
-                       Texture projectileTexture, List<Projectile> enemyProjectiles) {
-        super(x, y, texture, faceTexture, target);
+                       Texture projectileTexture, List<Projectile> enemyProjectiles,float worldHeight,float worldWidth) {
+        super(x, y, texture, faceTexture, target,worldHeight,worldWidth);
         this.projectileTexture = projectileTexture;
         this.enemyProjectiles = enemyProjectiles;
         this.health = 6;  // Ranged enemies have more health
@@ -63,7 +63,7 @@ public class EnemyRanged extends Enemy {
             dx /= dist;
             dy /= dist;
 
-            enemyProjectiles.add(new Projectile(getX(), getY(), dx, dy, projectileTexture, 5f));
+            enemyProjectiles.add(new Projectile(getX(), getY(), dx, dy, projectileTexture, 5f, worldHeight, worldHeight));
             timeSinceLastShot = 0f;
         }
     }
